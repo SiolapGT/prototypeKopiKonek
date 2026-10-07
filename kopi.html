@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KopiKonek – Specialty Coffee & Brewing Gear</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{cream:'#F9F8F6',espresso:'#2C1E16',terra:'#CC5500',sage:'#7C9082'},fontFamily:{serif:['"Playfair Display"','Georgia','serif'],sans:['"Plus Jakarta Sans"','Inter','system-ui','sans-serif']}}}}
+</script>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:150px;color-scheme:light}
+body{background:#F9F8F6;color:#2C1E16}
+.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{scrollbar-width:none}
+:focus-visible{outline:2px solid #CC5500;outline-offset:2px}
+@keyframes pour{from{stroke-dashoffset:40}to{stroke-dashoffset:0}}
+.stream{stroke-dasharray:6 6;animation:pour 1.2s linear infinite}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+</head>
+<body class="font-sans antialiased"><div id="store">
+
+<header class="sticky top-0 z-30 bg-cream/90 backdrop-blur border-b border-espresso/10">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8 py-4 flex items-center gap-4 lg:gap-8 flex-wrap">
+    <a href="#" class="font-serif text-2xl font-semibold tracking-tight shrink-0">KopiKonek</a>
+    <nav class="hidden lg:flex items-center gap-7 text-sm font-medium order-2">
+      <a class="hover:text-terra transition-colors" href="#catalog" data-nav="Single Origin Beans">Coffee Beans</a>
+      <a class="hover:text-terra transition-colors" href="#catalog" data-nav="Manual Brew Gear">Brewing Gear</a>
+      <a class="hover:text-terra transition-colors" href="#roasteries">Roasteries</a>
+      <a class="hover:text-terra transition-colors" href="#subscription">Subscription</a>
+    </nav>
+    <div class="relative flex-1 min-w-full sm:min-w-0 order-last sm:order-3 lg:max-w-md lg:ml-auto">
+      <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" type="search" placeholder="Search beans, roasteries, gear" aria-label="Search products" class="w-full rounded-full bg-white border border-espresso/15 pl-11 pr-4 py-3 text-sm placeholder:text-espresso/45 focus:border-terra focus:ring-2 focus:ring-terra/20 outline-none transition">
+    </div>
+    <button id="openCart" aria-label="Open cart" class="relative order-4 ml-auto sm:ml-0 p-3 rounded-full hover:bg-espresso/5 active:scale-95 transition">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H6.2"/><circle cx="9.5" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg>
+      <span id="badge" class="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1 rounded-full bg-terra text-white text-[11px] font-bold grid place-items-center transition-transform">0</span>
+    </button>
+  </div>
+  <nav class="lg:hidden flex gap-6 overflow-x-auto no-scrollbar px-5 pb-3 text-sm font-medium whitespace-nowrap">
+    <a href="#catalog" data-nav="Single Origin Beans">Coffee Beans</a><a href="#catalog" data-nav="Manual Brew Gear">Brewing Gear</a><a href="#roasteries">Roasteries</a><a href="#subscription">Subscription</a>
+  </nav>
+</header>
+
+<main>
+<section class="max-w-7xl mx-auto px-5 lg:px-8 pt-10 pb-16 lg:pt-20 lg:pb-24 grid lg:grid-cols-2 gap-12 items-center">
+  <div>
+    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.1] tracking-tight">Discover Freshly Roasted Beans &amp; Premium Gear.</h1>
+    <p class="mt-6 text-lg text-espresso/70 max-w-md leading-relaxed">Small-batch roasts from independent roasteries and the tools to brew them well, each order shipped straight from the seller.</p>
+    <div class="mt-9 flex flex-wrap items-center gap-5">
+      <a href="#catalog" class="inline-block bg-terra text-white font-semibold px-8 py-4 rounded-full hover:bg-espresso hover:shadow-lg active:scale-95 transition-all duration-300">Explore Catalog</a>
+      <span class="text-sm text-espresso/60">Every bag shows its roast date</span>
+    </div>
+  </div>
+  <div class="relative">
+    <div class="aspect-[4/5] sm:aspect-square lg:aspect-[4/5] rounded-[2rem] overflow-hidden bg-sage/25">
+      <svg viewBox="0 0 400 480" class="w-full h-full" role="img" aria-label="Illustration of pour-over coffee brewing into a cup">
+        <rect width="400" height="480" fill="#DDE3DE"/>
+        <circle cx="300" cy="90" r="120" fill="#7C9082" opacity=".25"/>
+        <rect x="0" y="392" width="400" height="88" fill="#C9A98A"/>
+        <path d="M130 120h140l-34 110h-72z" fill="#F9F8F6" stroke="#2C1E16" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M118 120h164" stroke="#2C1E16" stroke-width="8" stroke-linecap="round"/>
+        <path d="M145 150h110l-12 36h-86z" fill="#5a3a26"/>
+        <rect x="186" y="230" width="28" height="14" rx="3" fill="#2C1E16"/>
+        <path class="stream" d="M200 244v82" stroke="#5a3a26" stroke-width="5" stroke-linecap="round"/>
+        <path d="M140 316h120v36a34 34 0 0 1-34 34h-52a34 34 0 0 1-34-34z" fill="#CC5500"/>
+        <path d="M260 326h14a16 16 0 0 1 0 32h-18" fill="none" stroke="#CC5500" stroke-width="9"/>
+        <ellipse cx="200" cy="316" rx="60" ry="8" fill="#3b2619"/>
+        <path d="M60 80c10-20 40-20 50 0" stroke="#2C1E16" stroke-width="3" fill="none" opacity=".25"/>
+        <path d="M70 50c20 6 38-2 50 14" stroke="#2C1E16" stroke-width="3" fill="none" opacity=".25"/>
+      </svg>
+    </div>
+    <div class="absolute -bottom-5 left-5 sm:left-8 bg-white rounded-2xl shadow-xl shadow-espresso/10 px-5 py-4 flex items-center gap-3">
+      <span class="w-2.5 h-2.5 rounded-full bg-sage"></span>
+      <p class="text-sm font-medium">Roasted this week from 3 roasteries</p>
+    </div>
+  </div>
+</section>
+
+<section id="catalog" class="max-w-7xl mx-auto px-5 lg:px-8 py-12">
+  <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+    <h2 class="font-serif text-3xl lg:text-4xl font-semibold">The catalog</h2>
+    <p id="count" class="text-sm text-espresso/60"></p>
+  </div>
+  <div id="pills" class="flex gap-3 overflow-x-auto no-scrollbar pb-3 -mx-5 px-5 lg:mx-0 lg:px-0" role="tablist"></div>
+  <div id="grid" class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8"></div>
+  <p id="empty" class="hidden text-center py-20 text-espresso/60">Nothing matches that search. Try a roastery name or clear the filter.</p>
+</section>
+
+<section id="roasteries" class="bg-[#ECE7DF] py-20 lg:py-24">
+  <div class="reveal max-w-7xl mx-auto px-5 lg:px-8">
+    <div class="max-w-xl"><h2 class="font-serif text-3xl lg:text-4xl font-semibold">Meet Our Partner Roasteries</h2>
+    <p class="mt-3 text-espresso/70 leading-relaxed">Each roastery packs and ships its own orders, so your cart splits by seller with a separate shipping fee for each parcel.</p></div>
+  </div>
+  <div id="roastGrid" class="max-w-7xl mx-auto px-5 lg:px-8 mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+</section>
+
+<section id="matchmaker" class="max-w-7xl mx-auto px-5 lg:px-8 py-20">
+  <div class="reveal rounded-[2rem] bg-sage text-espresso px-6 py-12 lg:px-14 lg:py-16">
+    <h2 class="font-serif text-3xl lg:text-5xl font-semibold leading-tight max-w-2xl">Not sure what to choose? Find Your Perfect Brew.</h2>
+    <p id="how" class="mt-8 font-semibold">How do you brew?</p>
+    <div id="methods" role="radiogroup" aria-labelledby="how" class="mt-3 flex flex-wrap gap-3"></div>
+    <button id="match" class="mt-8 bg-espresso text-cream font-semibold px-8 py-4 rounded-full hover:bg-terra active:scale-95 transition-all duration-300">Get Matches</button>
+    <div id="matchOut" class="hidden mt-8"></div>
+  </div>
+</section>
+
+<section id="subscription" class="max-w-7xl mx-auto px-5 lg:px-8 pb-24">
+  <div class="rounded-[2rem] bg-espresso text-cream px-8 py-12 lg:px-14 lg:py-14 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+    <div><h2 class="font-serif text-3xl font-semibold">A fresh bag every two weeks</h2>
+    <p class="mt-3 text-cream/70 max-w-lg leading-relaxed">Pick a roastery and a roast profile. Skip or pause any delivery.</p></div>
+    <button class="bg-sage text-espresso font-semibold px-8 py-4 rounded-full hover:bg-cream active:scale-95 transition-all duration-300 self-start lg:self-auto" onclick="toast('Subscriptions are not part of this prototype')">Start a subscription</button>
+  </div>
+</section>
+</main>
+
+<footer class="border-t border-espresso/10 bg-white">
+ <div class="reveal max-w-7xl mx-auto px-5 lg:px-8 py-16 grid lg:grid-cols-12 gap-12">
+  <div class="lg:col-span-4">
+   <a href="#" class="font-serif text-2xl font-semibold">KopiKonek</a>
+   <p class="mt-4 text-sm text-espresso/70 leading-relaxed max-w-xs">An independent marketplace connecting home brewers with Indonesian specialty roasteries and trusted gear sellers.</p>
+   <form class="mt-6 flex gap-2" onsubmit="event.preventDefault();toast('Thanks, you are subscribed');this.reset()">
+    <label class="sr-only" for="nl">Email address</label>
+    <input id="nl" type="email" required placeholder="Subscribe for weekly fresh roast drops" class="min-w-0 flex-1 rounded-full bg-cream border border-espresso/15 px-4 py-3 text-sm placeholder:text-espresso/45 focus:border-terra focus:ring-2 focus:ring-terra/20 outline-none transition">
+    <button class="shrink-0 bg-terra text-white text-sm font-semibold px-5 rounded-full hover:bg-espresso active:scale-95 transition-all duration-300">Subscribe</button>
+   </form>
+  </div>
+  <div class="lg:col-span-5 grid grid-cols-2 gap-8 text-sm"><div><h3 class="font-semibold mb-4">Shop</h3><ul class="space-y-3 text-espresso/70"><li><a href="#" class="hover:text-terra transition-colors">Coffee Beans</a></li><li><a href="#" class="hover:text-terra transition-colors">Brewing Gear</a></li><li><a href="#" class="hover:text-terra transition-colors">Roasteries</a></li></ul></div><div><h3 class="font-semibold mb-4">Learn (Brew Guides)</h3><ul class="space-y-3 text-espresso/70"><li><a href="#" class="hover:text-terra transition-colors">V60 for beginners</a></li><li><a href="#" class="hover:text-terra transition-colors">Espresso basics</a></li><li><a href="#" class="hover:text-terra transition-colors">Cold brew ratios</a></li></ul></div><div><h3 class="font-semibold mb-4">Track Order</h3><ul class="space-y-3 text-espresso/70"><li><a href="#" class="hover:text-terra transition-colors">Find my order</a></li><li><a href="#" class="hover:text-terra transition-colors">Shipping and returns</a></li><li><a href="#" class="hover:text-terra transition-colors">Help center</a></li></ul></div><div><h3 class="font-semibold mb-4">Sell on KopiKonek (For Roasters)</h3><ul class="space-y-3 text-espresso/70"><li><a href="#" class="hover:text-terra transition-colors">Open a store</a></li><li><a href="#" class="hover:text-terra transition-colors">Seller guidelines</a></li><li><a href="#" class="hover:text-terra transition-colors">Seller login</a></li></ul></div></div>
+  <div class="lg:col-span-3 text-sm">
+   <h3 class="font-semibold mb-4">Secure payment</h3>
+   <div class="flex flex-wrap gap-2"><span class="h-8 inline-flex items-center px-3 border border-espresso/15 rounded-md bg-white text-[#1A1F71] font-extrabold italic" aria-label="Visa">VISA</span><span class="h-8 inline-flex items-center px-2 border border-espresso/15 rounded-md bg-white" aria-label="Mastercard"><svg viewBox="0 0 34 20" class="h-5"><circle cx="12" cy="10" r="8" fill="#EB001B"/><circle cx="22" cy="10" r="8" fill="#F79E1B" fill-opacity=".85"/></svg></span><span class="h-8 inline-flex items-center px-3 border border-espresso/15 rounded-md bg-white font-bold gap-1.5" aria-label="QRIS"><svg viewBox="0 0 12 12" class="w-3.5 h-3.5"><path d="M0 0h5v5H0zM7 0h5v5H7zM0 7h5v5H0zM7 7h2v2H7zM10 10h2v2h-2z" fill="#2C1E16"/></svg>QRIS</span></div>
+   <h3 class="font-semibold mt-8 mb-4">Follow us</h3>
+   <div class="flex gap-3"><a href="#" aria-label="Instagram" class="w-10 h-10 rounded-full border border-espresso/15 grid place-items-center hover:bg-espresso hover:text-cream active:scale-95 transition-all duration-300"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/></svg></a><a href="#" aria-label="YouTube" class="w-10 h-10 rounded-full border border-espresso/15 grid place-items-center hover:bg-espresso hover:text-cream active:scale-95 transition-all duration-300"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="m10 9 5 3-5 3z"/></svg></a><a href="#" aria-label="X" class="w-10 h-10 rounded-full border border-espresso/15 grid place-items-center hover:bg-espresso hover:text-cream active:scale-95 transition-all duration-300"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 4l16 16M20 4 4 20"/></svg></a></div>
+  </div>
+ </div>
+ <div class="border-t border-espresso/10 py-6 text-center text-xs text-espresso/60 px-5">© 2026 KopiKonek. Prices in Indonesian rupiah. All products are sample data for this prototype.</div>
+</footer>
+
+</div>
+<div id="checkoutView" class="hidden bg-[#F9F8F6]"><div id="root"></div></div>
+<div id="qv" class="fixed inset-0 z-[55] hidden items-end sm:items-center justify-center sm:p-6" role="dialog" aria-modal="true" aria-label="Quick view">
+  <div id="qvBg" class="absolute inset-0 bg-espresso/50 opacity-0 transition-opacity duration-300"></div>
+  <div id="qvBox" class="relative bg-cream w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl shadow-2xl translate-y-8 opacity-0 transition-all duration-300">
+    <button id="qvClose" aria-label="Close quick view" class="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 hover:bg-white active:scale-95 transition"><svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div id="qvBody" class="grid md:grid-cols-2"></div>
+  </div>
+</div>
+<div id="overlay" class="fixed inset-0 z-40 bg-espresso/40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+<aside id="drawer" aria-label="Shopping cart" class="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-cream shadow-2xl translate-x-full transition-transform duration-300 ease-out flex flex-col" style="padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)">
+  <div class="flex items-center justify-between px-6 py-5 border-b border-espresso/10">
+    <h2 class="font-serif text-2xl font-semibold">Your cart</h2>
+    <button id="closeCart" aria-label="Close cart" class="p-2 rounded-full hover:bg-espresso/5 active:scale-95 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div id="cartBody" class="flex-1 overflow-y-auto px-6 py-5 space-y-6"></div>
+  <div id="cartFoot" class="border-t border-espresso/10 px-6 py-5 bg-white"></div>
+</aside>
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-[60] bg-espresso text-cream text-sm px-5 py-3 rounded-full shadow-xl opacity-0 translate-y-4 pointer-events-none transition-all duration-300"></div>
+
+<script>
+const rp=n=>'Rp '+n.toLocaleString('id-ID');
+const SHIP={'Bandung Roastery':18000,'CoffeeGear Store':22000,'Gayo Highland Roasters':20000,'Flores Roast Co':19000,'Kintamani Coffee Lab':21000};
+const P=[
+ {id:1,t:'bean',cat:'Single Origin Beans',v:'Bandung Roastery',n:'Java Preanger',p:145000,tags:['Indonesia, West Java','Medium','Fruity, Caramel'],roast:2,c:'#7a4a2b'},
+ {id:2,t:'bean',cat:'Single Origin Beans',v:'Gayo Highland Roasters',n:'Aceh Gayo Natural',p:165000,tags:['Indonesia, Aceh','Light','Floral, Berry'],roast:4,c:'#a8623a'},
+ {id:3,t:'bean',cat:'Espresso Blends',v:'Bandung Roastery',n:'House Crema Blend',p:129000,tags:['Java + Brazil','Dark','Cocoa, Toasted Nut'],roast:3,c:'#3b2619'},
+ {id:4,t:'bean',cat:'Single Origin Beans',v:'Flores Roast Co',n:'Flores Bajawa',p:152000,tags:['Indonesia, Flores','Medium','Chocolate, Citrus'],roast:6,c:'#6b4a35'},
+ {id:5,t:'bean',cat:'Espresso Blends',v:'Kintamani Coffee Lab',n:'Morning Ristretto',p:139000,tags:['Bali + Sumatra','Dark','Caramel, Spice'],roast:12,c:'#2f2018'},
+ {id:6,t:'bean',cat:'Single Origin Beans',v:'Kintamani Coffee Lab',n:'Kintamani Washed',p:158000,tags:['Indonesia, Bali','Light','Fruity, Citrus'],roast:5,c:'#b5793f'},
+ {id:7,t:'gear',g:'dripper',cat:'Manual Brew Gear',v:'CoffeeGear Store',n:'V60 Ceramic Dripper 02',p:285000,tags:['Ceramic','1–4 cups','Hario']},
+ {id:8,t:'gear',g:'grinder',cat:'Grinders',v:'CoffeeGear Store',n:'C3 Manual Grinder',p:890000,tags:['Stainless steel','25 g','Timemore']},
+ {id:9,t:'gear',g:'kettle',cat:'Manual Brew Gear',v:'CoffeeGear Store',n:'Gooseneck Kettle',p:540000,tags:['Stainless steel','600 ml','Bonavita']},
+ {id:10,t:'gear',g:'press',cat:'Manual Brew Gear',v:'Flores Roast Co',n:'AeroPress Original',p:520000,tags:['BPA-free plastic','250 ml','AeroPress']}
+];
+const CATS=['All','Single Origin Beans','Espresso Blends','Manual Brew Gear','Grinders'];
+let cat='All',q='',cart={1:1,7:1};
+
+function art(p){
+ const bg=p.t==='bean'?'#E9E1D6':'#DDE3DE';
+ let s='';
+ if(p.t==='bean') s=`<path d="M105 70h110l14 24v150a10 10 0 0 1-10 10H101a10 10 0 0 1-10-10V94z" fill="${p.c}"/><path d="M105 70h110" stroke="#2C1E16" stroke-width="6" stroke-linecap="round"/><rect x="112" y="130" width="96" height="76" rx="8" fill="#F9F8F6"/><ellipse cx="160" cy="158" rx="12" ry="17" fill="${p.c}" transform="rotate(25 160 158)"/><path d="M152 148c6 8 6 18 16 20" stroke="#F9F8F6" stroke-width="2.5" fill="none"/><rect x="122" y="184" width="76" height="5" rx="2" fill="${p.c}" opacity=".5"/>`;
+ if(p.g==='dripper') s=`<path d="M95 100h130l-32 100h-66z" fill="#F9F8F6" stroke="#2C1E16" stroke-width="5" stroke-linejoin="round"/><path d="M110 125l100 0M117 150h86M126 175h68" stroke="#2C1E16" stroke-width="2" opacity=".3"/><rect x="132" y="204" width="56" height="12" rx="3" fill="#2C1E16"/><rect x="110" y="222" width="100" height="22" rx="6" fill="#CC5500"/>`;
+ if(p.g==='grinder') s=`<rect x="140" y="55" width="40" height="14" rx="4" fill="#2C1E16"/><path d="M160 69v28" stroke="#2C1E16" stroke-width="6"/><path d="M178 56h40" stroke="#2C1E16" stroke-width="6" stroke-linecap="round"/><path d="M122 97h76l-10 40h-56z" fill="#9aa59d"/><rect x="128" y="137" width="64" height="86" rx="6" fill="#c9d0cb"/><rect x="118" y="223" width="84" height="24" rx="6" fill="#7C9082"/>`;
+ if(p.g==='kettle') s=`<path d="M110 120h100l8 100a10 10 0 0 1-10 11H112a10 10 0 0 1-10-11z" fill="#9aa59d"/><path d="M210 138c40-10 56-50 78-72" stroke="#2C1E16" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M104 140c-34 6-34 60 0 66" stroke="#2C1E16" stroke-width="9" fill="none"/><rect x="132" y="104" width="56" height="16" rx="6" fill="#2C1E16"/>`;
+ if(p.g==='press') s=`<rect x="128" y="50" width="64" height="20" rx="5" fill="#2C1E16"/><rect x="138" y="70" width="44" height="42" fill="#7C9082"/><rect x="120" y="112" width="80" height="112" rx="8" fill="#F9F8F6" stroke="#2C1E16" stroke-width="5"/><rect x="127" y="170" width="66" height="48" rx="4" fill="#5a3a26"/><rect x="108" y="224" width="104" height="20" rx="6" fill="#CC5500"/>`;
+ return `<svg viewBox="0 0 320 300" class="w-full h-full transition-transform duration-500 group-hover:scale-105" role="img" aria-label="${p.n}"><rect width="320" height="300" fill="${bg}"/><ellipse cx="160" cy="262" rx="80" ry="8" fill="#2C1E16" opacity=".1"/>${s}</svg>`;
+}
+function fresh(d){return d<=1?'Roasted today':d+' days ago'}
+function card(p){
+ const bean=p.t==='bean';
+ const chips=p.tags.map((t,i)=>{
+  const lab=bean?['Origin','Roast','Notes'][i]:['Material','Capacity','Brand'][i];
+  return `<span class="inline-flex items-center gap-1 rounded-full border border-espresso/15 px-2.5 py-1 text-xs"><span class="text-espresso/50">${lab}</span><span class="font-medium">${t}</span></span>`}).join('');
+ const roast=bean?`<div class="flex items-center gap-2 text-xs font-medium ${p.roast<=7?'text-sage':'text-terra'}"><span class="w-2 h-2 rounded-full ${p.roast<=7?'bg-sage':'bg-terra'}"></span>Roast date: ${fresh(p.roast)}</div>`:`<div class="text-xs text-espresso/50">Brewing equipment</div>`;
+ return `<article class="group bg-white rounded-3xl overflow-hidden border border-espresso/5 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-espresso/10 transition-all duration-300 flex flex-col">
+  ${bean?`<button data-qv="${p.id}" aria-label="Quick view ${p.n}" class="relative block w-full aspect-[16/14] overflow-hidden"><span class="block w-full h-full">${art(p)}</span><span class="absolute bottom-3 right-3 bg-cream/95 text-xs font-semibold px-3.5 py-1.5 rounded-full shadow group-hover:bg-white transition-colors">Quick view</span></button>`:`<div class="aspect-[16/14] overflow-hidden">${art(p)}</div>`}
+  <div class="p-5 flex flex-col gap-3 flex-1">
+   <div><p class="text-xs font-semibold text-terra">${p.v}</p><h3 class="font-serif text-xl font-semibold mt-1 leading-snug">${p.n}</h3></div>
+   <div class="flex flex-wrap gap-1.5">${chips}</div>
+   ${roast}
+   <div class="mt-auto pt-3 flex items-center justify-between gap-3">
+    <span class="font-bold">${rp(p.p)}</span>
+    <button data-add="${p.id}" class="bg-espresso text-cream text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-terra active:scale-95 transition-all duration-300">Add to Cart</button>
+   </div>
+  </div></article>`;
+}
+function renderPills(){
+ pills.innerHTML=CATS.map(c=>`<button role="tab" aria-selected="${c===cat}" data-cat="${c}" class="shrink-0 px-5 py-2.5 rounded-full text-sm font-medium border transition-all duration-300 active:scale-95 ${c===cat?'bg-espresso text-cream border-espresso':'bg-transparent border-espresso/20 hover:border-espresso hover:bg-white'}">${c}</button>`).join('');
+}
+function renderGrid(){
+ const list=P.filter(p=>(cat==='All'||p.cat===cat)&&(p.n+p.v+p.tags.join(' ')).toLowerCase().includes(q.toLowerCase()));
+ grid.innerHTML=list.map(card).join('');
+ empty.classList.toggle('hidden',list.length>0);
+ count.textContent=list.length+(list.length===1?' product':' products');
+}
+function renderCart(){
+ const ids=Object.keys(cart).map(Number), n=ids.reduce((a,i)=>a+cart[i],0);
+ badge.textContent=n; badge.classList.toggle('scale-0',n===0);
+ if(!n){cartBody.innerHTML=`<div class="text-center py-20"><p class="font-serif text-xl">Your cart is empty</p><p class="text-sm text-espresso/60 mt-2">Add a bag of beans or a brewer to get started.</p></div>`;cartFoot.innerHTML='';return}
+ const groups={};ids.forEach(i=>{const p=P.find(x=>x.id===i);(groups[p.v]=groups[p.v]||[]).push(p)});
+ let total=0,ship=0;
+ cartBody.innerHTML=Object.entries(groups).map(([v,items])=>{
+  const sub=items.reduce((a,p)=>a+p.p*cart[p.id],0), sf=SHIP[v]; total+=sub; ship+=sf;
+  return `<section class="bg-white rounded-2xl border border-espresso/10 overflow-hidden">
+   <div class="px-4 py-3 bg-sage/15 flex items-center justify-between"><p class="text-sm font-semibold">Vendor: ${v}</p><p class="text-xs text-espresso/60">Ships separately</p></div>
+   <ul class="divide-y divide-espresso/10">${items.map(p=>`<li class="p-4 flex gap-3"><div class="w-16 h-16 rounded-xl overflow-hidden shrink-0">${art(p)}</div>
+     <div class="flex-1 min-w-0"><p class="font-semibold text-sm leading-snug">${p.n}</p><p class="text-xs text-espresso/60 mt-0.5">${p.t==='bean'?p.tags[1]+' roast'+(grind[p.id]?' · '+grind[p.id]:''):p.tags[0]}</p>
+     <div class="mt-2 flex items-center justify-between"><div class="flex items-center border border-espresso/15 rounded-full">
+      <button data-dec="${p.id}" aria-label="Decrease quantity" class="w-8 h-8 hover:bg-espresso/5 rounded-full active:scale-90 transition">−</button><span class="w-6 text-center text-sm">${cart[p.id]}</span><button data-inc="${p.id}" aria-label="Increase quantity" class="w-8 h-8 hover:bg-espresso/5 rounded-full active:scale-90 transition">+</button></div>
+      <span class="text-sm font-semibold">${rp(p.p*cart[p.id])}</span></div></div></li>`).join('')}</ul>
+   <dl class="px-4 py-3 text-sm bg-cream/60 space-y-1"><div class="flex justify-between"><dt class="text-espresso/60">Subtotal</dt><dd>${rp(sub)}</dd></div><div class="flex justify-between"><dt class="text-espresso/60">Shipping from ${v}</dt><dd>${rp(sf)}</dd></div></dl></section>`}).join('');
+ const parcels=Object.keys(groups).length;
+ cartFoot.innerHTML=`<dl class="space-y-1.5 text-sm"><div class="flex justify-between"><dt class="text-espresso/60">Items</dt><dd>${rp(total)}</dd></div><div class="flex justify-between"><dt class="text-espresso/60">Shipping (${parcels} ${parcels>1?'parcels':'parcel'})</dt><dd>${rp(ship)}</dd></div><div class="flex justify-between text-lg font-bold pt-2 border-t border-espresso/10 mt-2"><dt>Total</dt><dd>${rp(total+ship)}</dd></div></dl>
+  <button onclick="goCheckout()" class="mt-4 w-full bg-terra text-white font-semibold py-4 rounded-full hover:bg-espresso active:scale-[.98] transition-all duration-300">Checkout</button>`;
+}
+function setCart(open){
+ drawer.classList.toggle('translate-x-full',!open);
+ overlay.classList.toggle('opacity-0',!open);overlay.classList.toggle('pointer-events-none',!open);
+ document.body.style.overflow=open?'hidden':'';
+}
+let tt;function toast(m){toast_.textContent=m;toast_.classList.remove('opacity-0','translate-y-4');clearTimeout(tt);tt=setTimeout(()=>toast_.classList.add('opacity-0','translate-y-4'),2200)}
+const toast_=document.getElementById('toast');
+
+const FL={1:[3,3,4],2:[4,2,4],3:[2,5,3],4:[3,4,4],5:[2,5,4],6:[5,2,3]};
+const GR=['Whole Bean','Coarse / French Press','Medium / V60','Fine / Espresso'];
+const grind={};let qv={id:0,g:GR[0],n:1},method='';
+const R=[{n:'Bandung Roastery',i:'BR',loc:'Bandung, West Java',c:'#7a4a2b'},{n:'Gayo Highland Roasters',i:'GH',loc:'Takengon, Aceh',c:'#2C1E16'},{n:'Flores Roast Co',i:'FR',loc:'Bajawa, East Nusa Tenggara',c:'#7C9082'},{n:'Kintamani Coffee Lab',i:'KL',loc:'Kintamani, Bali',c:'#CC5500'}];
+const M={espresso:{ids:[3,5,8],t:'Dark, caramel-leaning blends build a thick crema, and a hand grinder lets you dial in the shot.'},manual:{ids:[1,2,7],t:'Fruity, clean light and medium roasts shine in a V60, so we paired them with a ceramic dripper.'},cold:{ids:[4,6,10],t:'Chocolate and citrus notes hold up through a long, cold extraction, and the AeroPress makes a quick concentrate.'}};
+
+function renderRoast(){roastGrid.innerHTML=R.map((r,i)=>`<div class="reveal" style="transition-delay:${i*90}ms"><article class="bg-cream rounded-3xl p-7 text-center border border-espresso/5 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-espresso/10 transition-all duration-300">
+ <div class="w-20 h-20 mx-auto rounded-full grid place-items-center text-cream font-serif text-2xl font-semibold ring-4 ring-white" style="background:${r.c}">${r.i}</div>
+ <h3 class="font-serif text-xl font-semibold mt-5">${r.n}</h3><p class="text-sm text-espresso/60 mt-1">${r.loc}</p><p class="text-xs text-sage font-semibold mt-3">${P.filter(x=>x.v===r.n).length} products listed</p>
+ <button data-vendor="${r.n}" class="mt-5 w-full border border-espresso/25 text-sm font-semibold py-2.5 rounded-full hover:bg-espresso hover:text-cream active:scale-95 transition-all duration-300">Visit Store</button></article></div>`).join('')}
+
+function renderMethods(){methods.innerHTML=[['espresso','Espresso Machine'],['manual','Manual Brew'],['cold','Cold Brew']].map(([k,l])=>`<button role="radio" aria-checked="${k===method}" data-method="${k}" class="px-6 py-3 rounded-full text-sm font-semibold border transition-all duration-300 active:scale-95 ${k===method?'bg-espresso text-cream border-espresso':'border-espresso/40 bg-cream/20 hover:bg-cream/60'}">${l}</button>`).join('')}
+function getMatches(){if(!method){toast('Choose how you brew first');return}
+ const m=M[method];
+ matchOut.innerHTML=`<p class="text-sm mb-4 max-w-2xl">${m.t}</p><div class="grid sm:grid-cols-3 gap-4">${m.ids.map(id=>{const p=P.find(x=>x.id===id);return `<div class="bg-cream rounded-2xl p-3 flex gap-3 items-center"><div class="w-16 h-16 rounded-xl overflow-hidden shrink-0">${art(p)}</div><div class="min-w-0 flex-1"><p class="text-xs text-terra font-semibold truncate">${p.v}</p><p class="text-sm font-semibold leading-snug">${p.n}</p><div class="mt-1.5 flex items-center justify-between gap-2"><span class="text-xs font-bold">${rp(p.p)}</span><button data-add="${id}" class="bg-espresso text-cream text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-terra active:scale-95 transition-all duration-300">Add to Cart</button></div></div></div>`}).join('')}</div>`;
+ matchOut.classList.remove('hidden')}
+
+function grindHTML(){return GR.map(g=>`<button role="radio" aria-checked="${g===qv.g}" data-grind="${g}" class="px-4 py-2 rounded-full text-sm border transition-all duration-300 active:scale-95 ${g===qv.g?'bg-espresso text-cream border-espresso':'border-espresso/20 bg-white hover:border-espresso'}">${g}</button>`).join('')}
+function qvBtn(){const p=P.find(x=>x.id===qv.id);qvAdd.textContent='Add to Cart · '+rp(p.p*qv.n);qvQty.textContent=qv.n}
+function renderQV(){
+ const p=P.find(x=>x.id===qv.id),f=FL[p.id],d=new Date(2026,9,7-p.roast).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+ const bar=(l,v)=>`<div><div class="flex justify-between text-sm mb-1.5"><span class="font-medium">${l}</span><span class="text-espresso/50">${v}/5</span></div><div class="h-2 rounded-full bg-espresso/10 overflow-hidden"><div class="h-full rounded-full bg-sage transition-all duration-1000 ease-out" style="width:0" data-w="${v*20}"></div></div></div>`;
+ const chips=p.tags.map((t,i)=>`<span class="rounded-full border border-espresso/15 px-3 py-1 text-xs"><span class="text-espresso/50">${['Origin','Roast','Notes'][i]}</span> <span class="font-medium">${t}</span></span>`).join(' ');
+ qvBody.innerHTML=`<div class="aspect-square md:aspect-auto md:min-h-full">${art(p)}</div>
+ <div class="p-6 sm:p-8 flex flex-col gap-5">
+  <div><p class="text-xs font-semibold text-terra">${p.v}</p><h3 class="font-serif text-3xl font-semibold mt-1">${p.n}</h3><p class="font-bold mt-2">${rp(p.p)} <span class="text-sm font-normal text-espresso/50">/ 250 g</span></p></div>
+  <div class="flex flex-wrap gap-1.5">${chips}</div>
+  <div class="rounded-2xl bg-sage/20 px-4 py-3.5 flex gap-3 items-start"><span class="w-2.5 h-2.5 mt-1.5 rounded-full bg-sage shrink-0"></span><div><p class="font-semibold text-sm">Freshly roasted on: ${d} – ${p.roast<=3?'Ready to rest!':'Ready to brew!'}</p><p class="text-xs text-espresso/60 mt-0.5">Peak flavor window: days 4 to 21 after roasting.</p></div></div>
+  <div><h4 class="font-semibold text-sm mb-3">Flavor profile</h4><div class="space-y-3">${bar('Acidity',f[0])}${bar('Body',f[1])}${bar('Sweetness',f[2])}</div></div>
+  <div><h4 class="font-semibold text-sm mb-3" id="gl">Grind size</h4><div id="qvGrind" role="radiogroup" aria-labelledby="gl" class="flex flex-wrap gap-2">${grindHTML()}</div></div>
+  <div class="flex items-center gap-3 pt-1">
+   <div class="flex items-center border border-espresso/20 rounded-full bg-white"><button data-q="-1" aria-label="Decrease quantity" class="w-11 h-11 rounded-full hover:bg-espresso/5 active:scale-90 transition">−</button><span id="qvQty" class="w-8 text-center font-semibold">1</span><button data-q="1" aria-label="Increase quantity" class="w-11 h-11 rounded-full hover:bg-espresso/5 active:scale-90 transition">+</button></div>
+   <button id="qvAdd" class="flex-1 bg-terra text-white font-semibold py-3.5 rounded-full hover:bg-espresso active:scale-[.98] transition-all duration-300"></button>
+  </div></div>`;
+ qvBtn();setTimeout(()=>qvBody.querySelectorAll('[data-w]').forEach(e=>e.style.width=e.dataset.w+'%'),60)}
+function openQV(id){qv={id,g:GR[0],n:1};renderQV();qvBox.scrollTop=0;qv_.classList.remove('hidden');qv_.classList.add('flex');document.body.style.overflow='hidden';
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{qvBg.classList.remove('opacity-0');qvBox.classList.remove('opacity-0','translate-y-8')}))}
+function closeQV(){qvBg.classList.add('opacity-0');qvBox.classList.add('opacity-0','translate-y-8');document.body.style.overflow='';setTimeout(()=>{qv_.classList.add('hidden');qv_.classList.remove('flex')},300)}
+const qv_=document.getElementById('qv');
+qvBg.onclick=closeQV;
+
+document.addEventListener('click',e=>{
+ const t=e.target.closest('button,a[data-nav]');if(!t)return;
+ if(t.dataset.cat){cat=t.dataset.cat;renderPills();renderGrid()}
+ if(t.dataset.nav){cat=t.dataset.nav;renderPills();renderGrid()}
+ if(t.dataset.add){const id=+t.dataset.add;cart[id]=(cart[id]||0)+1;renderCart();badge.classList.add('scale-125');setTimeout(()=>badge.classList.remove('scale-125'),200);
+   const p=P.find(x=>x.id===id);toast(p.n+' added to cart');t.textContent='Added';setTimeout(()=>t.textContent='Add to Cart',900)}
+ if(t.dataset.inc){cart[t.dataset.inc]++;renderCart()}
+ if(t.dataset.qv)openQV(+t.dataset.qv);
+ if(t.dataset.grind){qv.g=t.dataset.grind;qvGrind.innerHTML=grindHTML()}
+ if(t.dataset.q){qv.n=Math.max(1,Math.min(20,qv.n+(+t.dataset.q)));qvBtn()}
+ if(t.id==='qvClose')closeQV();
+ if(t.id==='qvAdd'){const p=P.find(x=>x.id===qv.id);cart[qv.id]=(cart[qv.id]||0)+qv.n;grind[qv.id]=qv.g;renderCart();closeQV();toast(qv.n+' × '+p.n+' ('+qv.g+') added to cart')}
+ if(t.dataset.vendor){cat='All';q=t.dataset.vendor;search.value=q;renderPills();renderGrid();document.getElementById('catalog').scrollIntoView({behavior:'smooth'})}
+ if(t.dataset.method){method=t.dataset.method;renderMethods()}
+ if(t.id==='match')getMatches();
+ if(t.dataset.dec){const i=t.dataset.dec;if(--cart[i]<=0)delete cart[i];renderCart()}
+});
+document.getElementById('openCart').onclick=()=>setCart(true);
+document.getElementById('closeCart').onclick=()=>setCart(false);
+overlay.onclick=()=>setCart(false);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){setCart(false);if(!qv_.classList.contains('hidden'))closeQV()}});
+search.addEventListener('input',e=>{q=e.target.value;renderGrid()});
+renderPills();renderGrid();renderCart();renderRoast();renderMethods();
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+
+<script>
+function goCheckout(){setCart(false);document.getElementById('store').classList.add('hidden');document.getElementById('checkoutView').classList.remove('hidden');window.scrollTo(0,0);mountCheckout()}
+function backToStore(){document.getElementById('checkoutView').classList.add('hidden');document.getElementById('store').classList.remove('hidden');window.scrollTo(0,0)}
+(function(){
+const {useState}=React;
+const html=htm.bind(React.createElement);
+const PLATFORM_FEE=2500;
+const PAY=[
+ {id:'va',label:'Virtual Account',sub:'BCA, Mandiri, BNI, BRI',hint:'You will get an account number to transfer to after you confirm.',
+  icon:'<path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/>'},
+ {id:'qris',label:'QRIS',sub:'Any bank or e-wallet',hint:'A QR code appears after you confirm. Scan it with any banking or e-wallet app.',
+  icon:'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z"/>'},
+ {id:'card',label:'Credit Card',sub:'Visa, Mastercard',hint:'You will enter your card details on the bank’s secure page.',
+  icon:'<rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10.5h18M7 15h3"/>'}
+];
+
+const Svg=({d,cls})=>html`<svg className=${cls||'w-5 h-5'} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true" dangerouslySetInnerHTML=${{__html:d}} />`;
+const LOCK='<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>';
+const Lock=({cls})=>html`<${Svg} d=${LOCK} cls=${cls||'w-4 h-4'} />`;
+
+
+const Thumb=({p})=>html`<div className="w-14 h-14 rounded-xl overflow-hidden shrink-0" dangerouslySetInnerHTML=${{__html:art(p)}} />`;
+function Field({label,name,v,set,err,span,type,ph,auto}){
+ return html`<div className=${span?'sm:col-span-2':''}>
+  <label htmlFor=${name} className="block text-sm font-medium mb-1.5">${label}</label>
+  <input id=${name} name=${name} type=${type||'text'} autoComplete=${auto} placeholder=${ph} value=${v[name]}
+   onChange=${e=>set({...v,[name]:e.target.value})} aria-invalid=${!!err[name]}
+   className=${'w-full rounded-lg border bg-white px-4 py-3 text-[15px] placeholder:text-gray-400 outline-none transition focus:border-[#7a5a45] focus:ring-4 focus:ring-[#7a5a45]/15 '+(err[name]?'border-[#C45E3A]':'border-gray-300')} />
+  ${err[name]&&html`<p className="mt-1.5 text-xs text-[#C45E3A]">${label} is required</p>`}
+ </div>`;
+}
+
+const H2=({children})=>html`<h2 className="font-serif text-2xl sm:text-[28px] font-semibold tracking-tight">${children}</h2>`;
+
+
+const meta=p=>p.t==='bean'?p.tags[1]+' roast'+(grind[p.id]?' · '+grind[p.id]:''):p.tags[0];
+
+function Package({g,sel,setSel}){
+ return html`<fieldset className="rounded-2xl bg-white border border-gray-200 p-5 sm:p-6">
+  <legend className="sr-only">Delivery for package ${g.n}</legend>
+  <p className="text-sm text-gray-600">Package ${g.n} from <span className="font-semibold text-[#2C1E16]">${g.vendor}</span></p>
+  <div className="mt-4 pb-5 border-b border-gray-100 space-y-4">
+   ${g.items.map(({p,qty})=>html`<div key=${p.id} className="flex items-center gap-4"><${Thumb} p=${p} /><div className="min-w-0"><p className="font-medium leading-snug">${p.n}</p><p className="text-sm text-gray-500 mt-0.5">${meta(p)} · Qty ${qty}</p></div></div>`)}
+  </div>
+  <div className="mt-5 grid gap-3" role="radiogroup">
+   ${g.opts.map(o=>{const on=sel===o.id;return html`<label key=${o.id} className=${'flex items-center gap-3 rounded-lg border px-4 py-3.5 cursor-pointer transition-all duration-200 '+(on?'border-[#C45E3A] bg-[#C45E3A]/5':'border-gray-200 bg-white hover:border-gray-400')}>
+    <input type="radio" name=${'ship-'+g.n} checked=${on} onChange=${()=>setSel(o.id)} className="w-4 h-4 accent-[#C45E3A]" />
+    <span className="flex-1 text-[15px]"><span className="font-medium">${o.label}</span>${o.eta&&html`<span className="text-gray-500"> (${o.eta})</span>`}</span>
+    <span className="text-[15px] font-semibold">${rp(o.fee)}</span></label>`})}
+  </div>
+ </fieldset>`;
+}
+
+function App({groups}){
+ const [f,setF]=useState({firstName:'',lastName:'',phone:'',address:'',city:'',zip:''});
+ const [ship,setShip]=useState({});
+ const [pay,setPay]=useState('qris');
+ const [status,setStatus]=useState('idle');
+ const err=status==='error'?Object.fromEntries(Object.keys(f).filter(k=>!f[k].trim()).map(k=>[k,1])):{};
+ const feeOf=g=>g.opts.find(o=>o.id===(ship[g.vendor]||'reg'));
+ const subtotal=groups.reduce((a,g)=>a+g.items.reduce((b,{p,qty})=>b+p.p*qty,0),0);
+ const shipping=groups.reduce((a,g)=>a+feeOf(g).fee,0);
+ const total=subtotal+shipping+PLATFORM_FEE;
+ const method=PAY.find(m=>m.id===pay);
+ const submit=()=>{
+  if(Object.values(f).some(v=>!v.trim())){setStatus('error');document.getElementById('shipping').scrollIntoView();return}
+  Object.keys(cart).forEach(k=>delete cart[k]);renderCart();setStatus('done');
+ };
+ const header=html`<header className="border-b border-[#2C1E16]/10"><div className="max-w-6xl mx-auto px-6 lg:px-8 py-6 grid sm:grid-cols-3 items-center gap-2">
+   <span className="hidden sm:block"></span>
+   <a href="#" onClick=${e=>{e.preventDefault();backToStore()}} className="font-serif text-3xl font-semibold tracking-tight text-center">KopiKonek</a>
+   <p className="flex items-center justify-center sm:justify-end gap-1.5 text-sm text-gray-600"><${Lock} />Secure Checkout</p></div></header>`;
+ const back=html`<button onClick=${backToStore} className="text-sm text-gray-600 hover:text-[#C45E3A] transition-colors mb-8">← Back to shop</button>`;
+ if(!groups.length&&status!=='done') return html`<div>${header}<main className="max-w-6xl mx-auto px-6 py-24 text-center"><p className="font-serif text-2xl">Your cart is empty</p><button onClick=${backToStore} className="mt-6 bg-[#C45E3A] text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-[#2C1E16] active:scale-95 transition-all duration-300">Back to shop</button></main></div>`;
+ return html`<div>${header}
+ <main className="max-w-6xl mx-auto px-6 lg:px-8 py-10 lg:py-14">
+  ${back}
+  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+  <div className="lg:col-span-7">
+   <section id="shipping" aria-labelledby="h1">
+    <${H2}><span id="h1">1. Shipping Address</span><//>
+    <div className="mt-8 grid sm:grid-cols-2 gap-x-5 gap-y-5">
+     <${Field} label="First Name" name="firstName" v=${f} set=${setF} err=${err} auto="given-name" />
+     <${Field} label="Last Name" name="lastName" v=${f} set=${setF} err=${err} auto="family-name" />
+     <${Field} label="Phone Number" name="phone" type="tel" ph="08xx xxxx xxxx" v=${f} set=${setF} err=${err} span=${true} auto="tel" />
+     <${Field} label="Full Address" name="address" ph="Street, building, house number" v=${f} set=${setF} err=${err} span=${true} auto="street-address" />
+     <${Field} label="City" name="city" v=${f} set=${setF} err=${err} auto="address-level2" />
+     <${Field} label="Zip Code" name="zip" v=${f} set=${setF} err=${err} auto="postal-code" />
+    </div>
+   </section>
+   <section className="mt-12 pt-12 border-t border-[#2C1E16]/10" aria-labelledby="h2">
+    <${H2}><span id="h2">2. Delivery Options</span><//>
+    <p className="mt-2 text-gray-600">Your items are coming from different roasteries/stores.</p>
+    <div className="mt-8 space-y-5">
+     ${groups.map(g=>html`<${Package} key=${g.vendor} g=${g} sel=${ship[g.vendor]||'reg'} setSel=${v=>setShip({...ship,[g.vendor]:v})} />`)}
+    </div>
+   </section>
+   <section className="mt-12 pt-12 border-t border-[#2C1E16]/10" aria-labelledby="h3">
+    <${H2}><span id="h3">3. Payment</span><//>
+    <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4" role="radiogroup" aria-labelledby="h3">
+     ${PAY.map(m=>{const on=pay===m.id;return html`<button key=${m.id} type="button" role="radio" aria-checked=${on} onClick=${()=>setPay(m.id)}
+      className=${'relative text-left rounded-xl border-2 p-5 transition-all duration-200 active:scale-[.98] '+(on?'border-[#C45E3A] bg-[#C45E3A]/5':'border-gray-200 bg-white hover:border-gray-400')}>
+      <${Svg} d=${m.icon} cls=${'w-7 h-7 '+(on?'text-[#C45E3A]':'text-[#2C1E16]')} />
+      <p className="mt-4 font-semibold">${m.label}</p><p className="text-sm text-gray-500 mt-0.5">${m.sub}</p>
+      ${on&&html`<span className="absolute top-4 right-4 w-5 h-5 rounded-full bg-[#C45E3A] text-white grid place-items-center"><${Svg} d='<path d="m5 12 4.5 4.5L19 7"/>' cls="w-3 h-3" /></span>`}
+     </button>`})}
+    </div>
+    <p className="mt-4 text-sm text-gray-600" aria-live="polite">${method.hint}</p>
+   </section>
+  </div>
+  <aside className="lg:col-span-5" aria-label="Order summary">
+   <div className="lg:sticky lg:top-8 bg-white rounded-2xl shadow-xl shadow-[#2C1E16]/5 p-6 sm:p-8">
+    <h2 className="font-serif text-2xl font-semibold">Order Summary</h2>
+    <div className="mt-6 space-y-6">
+     ${groups.map(g=>html`<div key=${g.vendor}>
+      <p className="text-xs font-semibold text-gray-500 mb-3">${g.vendor}</p>
+      <div className="space-y-3">${g.items.map(({p,qty})=>html`<div key=${p.id} className="flex gap-3 items-start"><${Thumb} p=${p} />
+       <div className="flex-1 min-w-0"><p className="text-sm font-medium leading-snug">${p.n}</p><p className="text-xs text-gray-500 mt-0.5">${meta(p)} · Qty ${qty}</p></div>
+       <p className="text-sm font-semibold">${rp(p.p*qty)}</p></div>`)}</div>
+      <p className="text-xs text-gray-500 mt-3">${feeOf(g).label} delivery · ${rp(feeOf(g).fee)}</p></div>`)}
+    </div>
+    <dl className="mt-7 pt-6 border-t border-gray-100 space-y-3 text-[15px]">
+     <div className="flex justify-between"><dt className="text-gray-600">Subtotal</dt><dd>${rp(subtotal)}</dd></div>
+     <div className="flex justify-between"><dt className="text-gray-600">Shipping Fee (Combined)</dt><dd>${rp(shipping)}</dd></div>
+     <div className="flex justify-between"><dt className="text-gray-600">Platform Fee</dt><dd>${rp(PLATFORM_FEE)}</dd></div>
+    </dl>
+    <div className="mt-5 pt-5 border-t border-gray-200 flex justify-between items-baseline"><span className="font-semibold">Grand Total</span><span className="text-2xl font-bold">${rp(total)}</span></div>
+    ${status==='done'
+     ?html`<div role="status" className="mt-7 rounded-xl bg-[#7C9082]/20 p-5 text-center"><p className="font-semibold">Order placed with ${method.label}</p><p className="text-sm mt-1">This is a prototype, so no payment was taken.</p><button onClick=${backToStore} className="mt-4 bg-[#C45E3A] text-white font-semibold px-6 py-3 rounded-xl hover:bg-[#2C1E16] active:scale-95 transition-all duration-300">Continue shopping</button></div>`
+     :html`<button onClick=${submit} className="mt-7 w-full flex items-center justify-center gap-2.5 bg-[#C45E3A] text-white text-lg font-semibold py-4 rounded-xl hover:bg-[#2C1E16] hover:shadow-lg active:scale-[.98] transition-all duration-300"><${Lock} cls="w-5 h-5" />Pay Now</button>`}
+    ${status==='error'&&html`<p role="alert" className="mt-3 text-sm text-[#C45E3A] text-center">Please complete the highlighted shipping fields.</p>`}
+    <p className="mt-5 text-xs text-gray-500 text-center leading-relaxed">Payments are processed securely via Escrow. Funds are only released to vendors once you receive your items.</p>
+   </div>
+  </aside>
+  </div>
+ </main></div>`;
+}
+let root;
+window.mountCheckout=function(){
+ const m={};Object.keys(cart).map(Number).forEach(id=>{const p=P.find(x=>x.id===id);(m[p.v]=m[p.v]||[]).push({p,qty:cart[id]})});
+ const groups=Object.entries(m).map(([v,items],i)=>({n:i+1,vendor:v,items,opts:[{id:'reg',label:'Regular',eta:'2-3 days',fee:SHIP[v]},{id:'next',label:'Next Day',eta:'',fee:SHIP[v]+10000}]}));
+ root=root||ReactDOM.createRoot(document.getElementById('root'));
+ root.render(html`<${App} key=${Date.now()} groups=${groups} />`);
+};
+})();
+</script>
+</body>
+</html>
