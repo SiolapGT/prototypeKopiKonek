@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BrewMarket — Specialty Coffee &amp; Brewing Gear Marketplace</title>
+  <meta name="description" content="Discover freshly roasted beans and premium brewing gear from independent Indonesian roasteries." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { cream: '#F9F8F6', espresso: '#2C1E16', terracotta: '#CC5500', sage: '#7C9082', taupe: '#EDE8E1' },
+          fontFamily: { serif: ['"Playfair Display"', 'Georgia', 'serif'], sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body class="bg-cream font-sans text-espresso antialiased">
+
+  <!-- ============ HEADER ============ -->
+  <header id="top" class="sticky top-0 z-40 border-b border-espresso/10 bg-cream/85 backdrop-blur-md">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex h-20 items-center gap-4 xl:gap-10">
+        <button id="menu-btn" class="-ml-2 rounded-full p-2 transition hover:bg-espresso/5 xl:hidden" aria-label="Open menu" aria-expanded="false">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+
+        <a href="#top" class="flex items-center gap-2 font-serif text-2xl font-bold tracking-tight">
+          <span class="grid h-8 w-8 place-items-center rounded-full bg-espresso text-cream">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C7 5 4.5 9 6 14c1.200 4 5 7 6 8 1-1 4.800-4 6-8 1.500-5-1-9-6-12Zm-.2 5.200c1.800 2.300 1.800 5.300.4 9.600-.2.600-1 .6-.8-.1 1-3.600 1-6.200.4-9.500Z"/></svg>
+          </span>
+          BrewMarket
+        </a>
+
+        <nav class="hidden items-center gap-8 text-sm font-medium xl:flex" aria-label="Primary">
+          <a href="#catalog" data-nav="single" class="nav-link">Coffee Beans</a>
+          <a href="#catalog" data-nav="manual" class="nav-link">Brewing Gear</a>
+          <a href="#roasteries" class="nav-link">Roasteries</a>
+          <a href="#subscription" data-nav="subscription" class="nav-link">Subscription</a>
+        </nav>
+
+        <form id="search-form" class="relative ml-auto hidden max-w-xl flex-1 md:block" role="search">
+          <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-espresso/50" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.500-3.500"/></svg>
+          <input id="search" type="search" autocomplete="off" placeholder="Search beans, roasteries, grinders…"
+                 class="w-full rounded-full border border-espresso/15 bg-white py-3 pl-12 pr-4 text-sm shadow-sm outline-none transition placeholder:text-espresso/40 focus:border-espresso/40 focus:ring-4 focus:ring-espresso/10" />
+        </form>
+
+        <div class="ml-auto flex items-center gap-1 md:ml-0">
+          <button id="cart-btn" class="relative rounded-full p-2.5 transition hover:bg-espresso/5 active:scale-95" aria-label="Open shopping cart">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.200 11.200a2 2 0 0 0 2 1.600h7.600a2 2 0 0 0 2-1.500L20.500 8H6.200"/><circle cx="9.500" cy="20" r="1.200"/><circle cx="17" cy="20" r="1.200"/></svg>
+            <span id="cart-badge" class="absolute -right-0.5 -top-0.5 grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-terracotta px-1 text-[11px] font-semibold text-white ring-2 ring-cream transition">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden border-t border-espresso/10 bg-cream xl:hidden">
+      <div class="mx-auto max-w-7xl space-y-5 px-4 py-5 sm:px-6">
+        <form id="search-form-m" class="relative md:hidden" role="search">
+          <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-espresso/50" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.500-3.500"/></svg>
+          <input id="search-m" type="search" autocomplete="off" placeholder="Search beans, roasteries, grinders…"
+                 class="w-full rounded-full border border-espresso/15 bg-white py-3 pl-12 pr-4 text-sm outline-none focus:border-espresso/40 focus:ring-4 focus:ring-espresso/10" />
+        </form>
+        <nav class="grid gap-1 text-base font-medium">
+          <a href="#catalog" data-nav="single" class="rounded-lg px-3 py-3 hover:bg-espresso/5">Coffee Beans</a>
+          <a href="#catalog" data-nav="manual" class="rounded-lg px-3 py-3 hover:bg-espresso/5">Brewing Gear</a>
+          <a href="#roasteries" class="rounded-lg px-3 py-3 hover:bg-espresso/5">Roasteries</a>
+          <a href="#subscription" data-nav="subscription" class="rounded-lg px-3 py-3 hover:bg-espresso/5">Subscription</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="relative overflow-hidden">
+      <div class="pointer-events-none absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-terracotta/10 blur-3xl"></div>
+      <div class="mx-auto grid max-w-7xl items-center gap-12 px-4 pb-20 pt-12 sm:px-6 lg:grid-cols-12 lg:gap-8 lg:px-8 lg:pb-28 lg:pt-20">
+        <div class="relative lg:col-span-6">
+          <span class="inline-flex items-center gap-2 rounded-full border border-sage/40 bg-sage/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-[#55695B]">
+            <span class="h-1.5 w-1.5 rounded-full bg-sage"></span> Roasted to order · Indonesian roasteries
+          </span>
+          <h1 class="mt-6 font-serif text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
+            Discover Freshly Roasted Beans <span class="italic text-terracotta">&amp;</span> Premium Gear.
+          </h1>
+          <p class="mt-6 max-w-xl text-lg leading-relaxed text-espresso/70">
+            One marketplace, dozens of independent roasteries. Every bag carries its roast date, every order is protected by escrow, and every brew starts better.
+          </p>
+          <div class="mt-9 flex flex-wrap items-center gap-4">
+            <a href="#catalog" class="group inline-flex items-center gap-2 rounded-full bg-terracotta px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-terracotta/25 transition duration-300 hover:-translate-y-0.5 hover:bg-[#B34A00] hover:shadow-xl active:scale-95">
+              Explore Catalog
+              <svg class="h-4 w-4 transition group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a href="#matchmaker" class="rounded-full border border-espresso/20 px-7 py-4 text-sm font-semibold transition duration-300 hover:border-espresso hover:bg-espresso hover:text-cream active:scale-95">Find my brew</a>
+          </div>
+          <dl class="mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-espresso/10 pt-8">
+            <div><dt class="sr-only">Roasteries</dt><dd class="font-serif text-3xl font-semibold">40+</dd><p class="mt-1 text-xs text-espresso/60">Partner roasteries</p></div>
+            <div><dt class="sr-only">Products</dt><dd class="font-serif text-3xl font-semibold">850</dd><p class="mt-1 text-xs text-espresso/60">Beans &amp; gear</p></div>
+            <div><dt class="sr-only">Rating</dt><dd class="font-serif text-3xl font-semibold">4.9</dd><p class="mt-1 text-xs text-espresso/60">Avg. rating</p></div>
+          </dl>
+        </div>
+
+        <div class="relative lg:col-span-6">
+          <div class="relative mx-auto max-w-xl lg:max-w-none">
+            <div class="absolute -inset-4 rounded-[3rem] bg-gradient-to-br from-terracotta/20 to-sage/20 blur-2xl"></div>
+            <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&q=80&w=1200" alt="Barista pouring hot water over a pour-over coffee setup"
+                 onerror="this.onerror=null;this.src=BM.fallback"
+                 class="relative aspect-[4/5] w-full rounded-[2.5rem] object-cover shadow-2xl shadow-espresso/20 sm:aspect-[5/5] lg:aspect-[4/4.600]" />
+            <div class="float-card absolute -bottom-6 left-4 flex items-center gap-4 rounded-2xl bg-white p-4 pr-6 shadow-xl sm:-left-6">
+              <span class="grid h-12 w-12 place-items-center rounded-full bg-sage/15 text-[#55695B]">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"/></svg>
+              </span>
+              <div><p class="text-xs uppercase tracking-wider text-espresso/50">Just roasted</p><p class="font-semibold">Kala Roastery · 2 days ago</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust strip -->
+    <section class="border-y border-espresso/10 bg-white/60">
+      <div class="mx-auto grid max-w-7xl gap-6 px-4 py-8 text-sm sm:grid-cols-3 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-3"><span class="text-terracotta">◆</span><p><strong>Roast date on every bag</strong> <span class="text-espresso/60">— never stale</span></p></div>
+        <div class="flex items-center gap-3"><span class="text-terracotta">◆</span><p><strong>Escrow protection</strong> <span class="text-espresso/60">— paid when delivered</span></p></div>
+        <div class="flex items-center gap-3"><span class="text-terracotta">◆</span><p><strong>Split-cart shipping</strong> <span class="text-espresso/60">— direct from each roaster</span></p></div>
+      </div>
+    </section>
+
+    <!-- ============ CATALOG ============ -->
+    <section id="catalog" class="mx-auto max-w-7xl scroll-mt-24 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <div class="reveal flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-terracotta">The Catalog</p>
+          <h2 class="mt-3 font-serif text-3xl font-semibold sm:text-4xl">Brewed for every ritual</h2>
+        </div>
+        <label class="flex items-center gap-3 text-sm text-espresso/70">
+          Sort
+          <select id="sort" class="rounded-full border border-espresso/15 bg-white px-4 py-2 text-sm text-espresso outline-none transition focus:border-espresso/40 focus:ring-4 focus:ring-espresso/10">
+            <option value="featured">Featured</option>
+            <option value="low">Price: low to high</option>
+            <option value="high">Price: high to low</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="filters" class="reveal mt-8 flex gap-3 overflow-x-auto pb-2 no-scrollbar" role="tablist" aria-label="Product filters"></div>
+      <div id="active-vendor" class="mt-4 hidden"></div>
+      <p id="result-count" class="mt-6 text-sm text-espresso/60" aria-live="polite"></p>
+
+      <div id="grid" class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+      <div id="empty" class="hidden rounded-3xl border border-dashed border-espresso/20 py-20 text-center">
+        <p class="font-serif text-2xl">No matches found</p>
+        <p class="mt-2 text-sm text-espresso/60">Try a different search or category.</p>
+        <button id="reset-filters" class="mt-6 rounded-full border border-espresso/20 px-6 py-3 text-sm font-semibold transition hover:bg-espresso hover:text-cream">Clear filters</button>
+      </div>
+    </section>
+
+    <!-- ============ SPOTLIGHT / QUICK VIEW ============ -->
+    <section id="spotlight" class="mx-auto max-w-7xl scroll-mt-24 px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28">
+      <div class="reveal mb-8 flex flex-col gap-2">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-terracotta">Roaster’s Pick · Quick-View</p>
+        <h2 class="font-serif text-3xl font-semibold sm:text-4xl">Pick your grind. Know your cup.</h2>
+        <p class="max-w-2xl text-espresso/65">This is the same detail view that opens when you click any coffee bean in the catalog.</p>
+      </div>
+      <div id="spotlight-mount" class="reveal overflow-hidden rounded-[2rem] border border-espresso/10 bg-white shadow-xl shadow-espresso/5"></div>
+    </section>
+
+    <!-- ============ PARTNER ROASTERIES ============ -->
+    <section id="roasteries" class="scroll-mt-20 bg-taupe py-20 lg:py-28">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="reveal flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#55695B]">Our Community</p>
+            <h2 class="mt-3 font-serif text-3xl font-semibold sm:text-4xl">Meet Our Partner Roasteries</h2>
+            <p class="mt-3 max-w-xl text-espresso/65">Small-batch roasters from across the archipelago, each vetted for quality and freshness.</p>
+          </div>
+          <div class="hidden gap-2 sm:flex">
+            <button id="rs-prev" class="grid h-11 w-11 place-items-center rounded-full border border-espresso/20 transition hover:bg-espresso hover:text-cream active:scale-95" aria-label="Previous">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m15 6-6 6 6 6"/></svg></button>
+            <button id="rs-next" class="grid h-11 w-11 place-items-center rounded-full border border-espresso/20 transition hover:bg-espresso hover:text-cream active:scale-95" aria-label="Next">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m9 6 6 6-6 6"/></svg></button>
+          </div>
+        </div>
+        <div id="roastery-row" class="reveal -mx-4 mt-12 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4 no-scrollbar sm:mx-0 sm:px-0"></div>
+      </div>
+    </section>
+
+    <!-- ============ BREW MATCHMAKER ============ -->
+    <section id="matchmaker" class="mx-auto max-w-7xl scroll-mt-20 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <div class="reveal relative overflow-hidden rounded-[2rem] bg-espresso px-6 py-14 text-cream sm:px-12 lg:px-16 lg:py-20">
+        <div class="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-terracotta/30 blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-sage/25 blur-3xl"></div>
+        <div class="relative mx-auto max-w-3xl text-center">
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#E8A27A]">Brew Matchmaker</p>
+          <h2 class="mt-4 font-serif text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl">Not sure what to choose? <span class="italic text-[#E8A27A]">Find Your Perfect Brew.</span></h2>
+          <p class="mt-6 text-lg text-cream/70">Tell us how you brew and we’ll pair you with beans and gear that suit your routine.</p>
+
+          <fieldset class="mt-10">
+            <legend class="mb-4 text-sm font-semibold uppercase tracking-widest text-cream/60">How do you brew?</legend>
+            <div id="brew-options" class="flex flex-col justify-center gap-3 sm:flex-row">
+              <label class="brew-opt"><input type="radio" name="brew" value="espresso" class="peer sr-only" /><span>Espresso Machine</span></label>
+              <label class="brew-opt"><input type="radio" name="brew" value="manual" class="peer sr-only" /><span>Manual Brew</span></label>
+              <label class="brew-opt"><input type="radio" name="brew" value="cold" class="peer sr-only" /><span>Cold Brew</span></label>
+            </div>
+          </fieldset>
+          <button id="get-matches" class="mt-8 inline-flex items-center gap-2 rounded-full bg-terracotta px-9 py-4 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#E0600A] hover:shadow-xl hover:shadow-terracotta/30 active:scale-95">
+            Get Matches
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </button>
+          <p id="match-hint" class="mt-4 h-5 text-sm text-[#E8A27A]" aria-live="polite"></p>
+        </div>
+        <div id="match-results" class="relative mx-auto mt-10 hidden max-w-5xl"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer id="subscription" class="bg-espresso text-cream/80">
+    <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+      <div class="reveal grid gap-14 lg:grid-cols-12">
+        <div class="lg:col-span-4">
+          <a href="#top" class="flex items-center gap-2 font-serif text-2xl font-bold text-cream">
+            <span class="grid h-8 w-8 place-items-center rounded-full bg-cream text-espresso">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C7 5 4.500 9 6 14c1.200 4 5 7 6 8 1-1 4.800-4 6-8 1.500-5-1-9-6-12Z"/></svg>
+            </span>
+            BrewMarket
+          </a>
+          <p class="mt-5 max-w-sm text-sm leading-relaxed text-cream/65">An independent marketplace connecting coffee lovers with Indonesia’s best small-batch roasters and brewing gear makers.</p>
+          <form id="newsletter" class="mt-8" novalidate>
+            <label for="nl-email" class="text-sm font-semibold text-cream">Subscribe for weekly fresh roast drops</label>
+            <div class="mt-3 flex overflow-hidden rounded-full bg-cream/10 p-1 ring-1 ring-cream/20 transition focus-within:ring-2 focus-within:ring-[#E8A27A]">
+              <input id="nl-email" type="email" placeholder="you@email.com" class="min-w-0 flex-1 bg-transparent px-4 text-sm text-cream outline-none placeholder:text-cream/40" />
+              <button class="rounded-full bg-terracotta px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#E0600A] active:scale-95">Subscribe</button>
+            </div>
+            <p id="nl-msg" class="mt-2 h-5 text-xs" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="grid grid-cols-2 gap-10 lg:col-span-5 lg:pl-6">
+          <div>
+            <h3 class="font-serif text-lg text-cream">Shop</h3>
+            <ul class="mt-4 space-y-3 text-sm">
+              <li><a class="footer-link" href="#catalog" data-nav="single">Coffee Beans</a></li>
+              <li><a class="footer-link" href="#catalog" data-nav="manual">Brewing Gear</a></li>
+              <li><a class="footer-link" href="#catalog" data-nav="grinder">Grinders</a></li>
+              <li><a class="footer-link" href="#roasteries">Roasteries</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-serif text-lg text-cream">Learn (Brew Guides)</h3>
+            <ul class="mt-4 space-y-3 text-sm">
+              <li><a class="footer-link" href="#matchmaker">V60 for beginners</a></li>
+              <li><a class="footer-link" href="#matchmaker">Dialing in espresso</a></li>
+              <li><a class="footer-link" href="#matchmaker">Cold brew at home</a></li>
+              <li><a class="footer-link" href="#spotlight">Grind size guide</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-serif text-lg text-cream">Track Order</h3>
+            <ul class="mt-4 space-y-3 text-sm">
+              <li><a class="footer-link" href="#">Order status</a></li>
+              <li><a class="footer-link" href="#">Shipping &amp; delivery</a></li>
+              <li><a class="footer-link" href="#">Returns &amp; refunds</a></li>
+              <li><a class="footer-link" href="#">Escrow protection</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-serif text-lg text-cream">Sell on BrewMarket <span class="block font-sans text-xs text-cream/50">(For Roasters)</span></h3>
+            <ul class="mt-4 space-y-3 text-sm">
+              <li><a class="footer-link" href="#">Open your store</a></li>
+              <li><a class="footer-link" href="#">Seller dashboard</a></li>
+              <li><a class="footer-link" href="#">Fees &amp; payouts</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="lg:col-span-3">
+          <h3 class="font-serif text-lg text-cream">Secure payments</h3>
+          <div class="mt-4 flex flex-wrap gap-3" aria-label="Accepted payment methods">
+            <span class="pay-badge" title="Visa"><svg viewBox="0 0 48 16" class="h-4"><text x="0" y="14" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="17" fill="#1A1F71">VISA</text></svg></span>
+            <span class="pay-badge" title="Mastercard"><svg viewBox="0 0 36 24" class="h-5"><circle cx="13" cy="12" r="9" fill="#EB001B"/><circle cx="23" cy="12" r="9" fill="#F79E1B" fill-opacity=".9"/><path d="M18 5.100a9 9 0 0 1 0 13.800 9 9 0 0 1 0-13.800Z" fill="#FF5F00"/></svg></span>
+            <span class="pay-badge" title="QRIS"><svg viewBox="0 0 24 24" class="h-5 w-5"><path fill="#2C1E16" d="M3 3h7v7H3V3Zm2 2v3h3V5H5Zm9-2h7v7h-7V3Zm2 2v3h3V5h-3ZM3 14h7v7H3v-7Zm2 2v3h3v-3H5Zm9-2h2v2h-2v-2Zm3 0h4v2h-2v2h-2v-4Zm-3 4h2v3h-2v-3Zm4 1h3v2h-3v-2Z"/></svg><b class="ml-1 text-xs tracking-wide text-espresso">QRIS</b></span>
+          </div>
+          <p class="mt-3 flex items-center gap-2 text-xs text-cream/55">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            256-bit encryption · Escrow-protected
+          </p>
+          <h3 class="mt-9 font-serif text-lg text-cream">Follow us</h3>
+          <div class="mt-4 flex gap-3">
+            <a href="#" aria-label="Instagram" class="social"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.500" cy="6.500" r="1" fill="currentColor"/></svg></a>
+            <a href="#" aria-label="YouTube" class="social"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M21.600 7.200a2.500 2.500 0 0 0-1.800-1.800C18.200 5 12 5 12 5s-6.200 0-7.800.4A2.500 2.500 0 0 0 2.400 7.200C2 8.800 2 12 2 12s0 3.200.4 4.800a2.500 2.500 0 0 0 1.800 1.800C5.800 19 12 19 12 19s6.200 0 7.800-.4a2.500 2.500 0 0 0 1.800-1.800c.4-1.600.4-4.800.4-4.800s0-3.200-.4-4.800ZM10 15V9l5.200 3L10 15Z"/></svg></a>
+            <a href="#" aria-label="TikTok" class="social"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M16.600 3c.3 2.300 1.600 3.700 3.900 3.900v2.800c-1.300.1-2.500-.3-3.800-1.100v5.300c0 6.700-7.300 8.800-10.200 4-1.900-3.100-.7-8.500 5.300-8.700v3c-.5.100-.9.200-1.300.4-1.300.5-2 1.400-1.800 2.800.4 2.800 5.500 3.600 5.100-1.800V3h2.800Z"/></svg></a>
+            <a href="#" aria-label="X / Twitter" class="social"><svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.200 2H21l-6.500 7.400L22 22h-6l-4.700-6.100L5.800 22H3l7-7.900L2.500 2h6.100l4.300 5.600L18.200 2Zm-1 18h1.600L7.900 3.700H6.200L17.200 20Z"/></svg></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-16 flex flex-col gap-3 border-t border-cream/10 pt-8 text-xs text-cream/50 sm:flex-row sm:justify-between">
+        <p>© 2026 BrewMarket. Crafted for coffee lovers.</p>
+        <p class="flex gap-6"><a href="#" class="hover:text-cream">Privacy</a><a href="#" class="hover:text-cream">Terms</a><a href="#" class="hover:text-cream">Cookies</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ CART DRAWER (split-cart) ============ -->
+  <div id="cart-overlay" class="pointer-events-none fixed inset-0 z-50 bg-espresso/40 opacity-0 backdrop-blur-sm transition-opacity duration-300"></div>
+  <aside id="cart-drawer" class="fixed inset-y-0 right-0 z-50 flex w-full max-w-md translate-x-full flex-col bg-cream shadow-2xl transition-transform duration-300 ease-out" aria-hidden="true" aria-label="Shopping cart">
+    <div class="flex items-center justify-between border-b border-espresso/10 px-6 py-5">
+      <div>
+        <h2 class="font-serif text-2xl font-semibold">Your Cart</h2>
+        <p id="cart-sub" class="mt-0.5 text-xs text-espresso/55"></p>
+      </div>
+      <button id="cart-close" class="rounded-full p-2 transition hover:bg-espresso/5 active:scale-90" aria-label="Close cart">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div id="cart-body" class="flex-1 space-y-5 overflow-y-auto px-6 py-6"></div>
+    <div id="cart-footer" class="border-t border-espresso/10 bg-white px-6 py-5"></div>
+  </aside>
+
+  <!-- ============ QUICK VIEW MODAL ============ -->
+  <div id="qv" class="fixed inset-0 z-[60] hidden items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true" aria-label="Product quick view">
+    <div id="qv-overlay" class="absolute inset-0 bg-espresso/50 opacity-0 backdrop-blur-sm transition-opacity duration-300"></div>
+    <div id="qv-panel" class="relative max-h-full w-full max-w-5xl translate-y-4 scale-95 overflow-y-auto rounded-[2rem] bg-white opacity-0 shadow-2xl transition duration-300">
+      <button id="qv-close" class="absolute right-4 top-4 z-10 rounded-full bg-white/90 p-2 shadow transition hover:bg-white active:scale-90" aria-label="Close quick view">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <div id="qv-content"></div>
+    </div>
+  </div>
+
+  <div id="toasts" class="pointer-events-none fixed inset-x-0 bottom-6 z-[70] flex flex-col items-center gap-2 px-4"></div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
