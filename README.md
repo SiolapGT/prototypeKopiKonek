@@ -76,4 +76,4 @@ Then visit `http://localhost:3000`.
 ---
 
 ## ☕ License
-MIT License. Created with passion for coffee culture.
+Created with passion for coffee culture.
