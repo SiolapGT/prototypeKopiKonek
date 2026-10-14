@@ -1,4 +1,4 @@
-# BrewMarket ☕
+# KopiKonek ☕
 
 A modern, premium e-commerce web prototype for a specialty coffee and brewing equipment marketplace with multi-vendor split-cart logic.
 

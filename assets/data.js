@@ -1,11 +1,11 @@
-/* BrewMarket — shared catalog, vendors & cart store (used by index.html and checkout.html) */
+/* KopiKonek — shared catalog, vendors & cart store (used by index.html and checkout.html) */
 (function () {
   'use strict';
 
   /* The prototype pretends "today" is this date so roast-date labels stay consistent. */
   var PROTOTYPE_TODAY = new Date(2026, 9, 14);
   var PLATFORM_FEE = 2500;
-  var CART_KEY = 'brewmarket_cart_v1';
+  var CART_KEY = 'kopikonek_cart_v1';
 
   var FALLBACK_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +

@@ -1,4 +1,4 @@
-/* BrewMarket homepage logic */
+/* KopiKonek homepage logic */
 (function () {
   'use strict';
   var BM = window.BM;
