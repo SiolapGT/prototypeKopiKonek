@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Secure Checkout — BrewMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { cream: '#F9F8F6', espresso: '#2C1E16', rust: '#C45E3A', sage: '#7C9082' },
+          fontFamily: { serif: ['"Playfair Display"', 'Georgia', 'serif'], sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { background: #F9F8F6; }
+    .font-serif { font-variant-numeric: lining-nums; font-feature-settings: 'lnum' 1; }
+    .fade-in { animation: fadeIn .45s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes pop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+    .pop { animation: pop .6s cubic-bezier(.2, .8, .2, 1) both; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { animation: spin .8s linear infinite; }
+    @media (prefers-reduced-motion: reduce) { * { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+  </style>
+</head>
+<body class="font-sans text-[#2C1E16] antialiased">
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+  <script src="assets/data.js"></script>
+
+  <script type="text/babel" data-presets="react">
+    const { useState, useMemo, useRef } = React;
+    const BM = window.BM;
+    const fmt = BM.fmt;
+
+    /* ---------- Icons ---------- */
+    const Lock = ({ className = 'h-4 w-4' }) => (
+      <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="5" y="11" width="14" height="9" rx="2" /><path strokeLinecap="round" d="M8 11V8a4 4 0 0 1 8 0v3" />
+      </svg>
+    );
+    const Shield = ({ className = 'h-4 w-4' }) => (
+      <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3 4.500 6v5.500c0 4.400 3.100 8 7.500 9.500 4.400-1.500 7.500-5.100 7.500-9.500V6L12 3Zm-3 9 2.200 2.200L15.500 10" />
+      </svg>
+    );
+    const Truck = ({ className = 'h-4 w-4' }) => (
+      <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a1.500 1.500 0 1 0 0-3 1.500 1.500 0 0 0 0 3Zm10 0a1.500 1.500 0 1 0 0-3 1.500 1.500 0 0 0 0 3Z" />
+      </svg>
+    );
+    const Check = ({ className = 'h-4 w-4' }) => (
+      <svg className={className} fill="none" stroke="currentColor" strokeWidth="2.6" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="m5 13 4 4L19 7" /></svg>
+    );
+    const BankIcon = () => (
+      <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.6" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M3 10 12 4l9 6M5 10v8m4-8v8m6-8v8m4-8v8M3 20h18" /></svg>
+    );
+    const QrIcon = () => (
+      <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.6" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinejoin="round" d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v4h-4M14 18h2v2h-2z" /></svg>
+    );
+    const CardIcon = () => (
+      <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.6" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.500" /><path d="M3 10h18M7 15h4" strokeLinecap="round" /></svg>
+    );
+
+    /* ---------- Form primitives ---------- */
+    const inputCls = (err) =>
+      'w-full rounded-lg border bg-white px-4 py-3 text-sm text-[#2C1E16] placeholder:text-gray-400 outline-none transition ' +
+      'focus:border-[#2C1E16]/60 focus:ring-4 focus:ring-[#2C1E16]/10 ' + (err ? 'border-red-400' : 'border-gray-300 hover:border-gray-400');
+
+    function Field({ id, label, error, className = '', children }) {
+      return (
+        <div className={className}>
+          <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-[#2C1E16]">{label}</label>
+          {children}
+          {error && <p id={id + '-err'} className="mt-1.5 text-xs text-red-600 fade-in">{error}</p>}
+        </div>
+      );
+    }
+
+    function TextInput({ id, label, value, onChange, error, className, ...rest }) {
+      return (
+        <Field id={id} label={label} error={error} className={className}>
+          <input id={id} name={id} value={value} onChange={(e) => onChange(e.target.value)}
+                 aria-invalid={error ? 'true' : 'false'} aria-describedby={error ? id + '-err' : undefined}
+                 className={inputCls(error)} {...rest} />
+        </Field>
+      );
+    }
+
+    function SectionTitle({ children, sub }) {
+      return (
+        <div className="mb-8">
+          <h2 className="font-serif text-2xl font-semibold text-[#2C1E16] sm:text-[1.7rem]">{children}</h2>
+          {sub && <p className="mt-2 text-sm text-gray-600">{sub}</p>}
+        </div>
+      );
+    }
+
+    /* ---------- Sections ---------- */
+    function ShippingSection({ form, setField, errors }) {
+      return (
+        <section aria-labelledby="sec-ship">
+          <SectionTitle><span id="sec-ship">1. Shipping Address</span></SectionTitle>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <TextInput id="first" label="First name" value={form.first} onChange={(v) => setField('first', v)} error={errors.first} autoComplete="given-name" placeholder="Rani" />
+            <TextInput id="last" label="Last name" value={form.last} onChange={(v) => setField('last', v)} error={errors.last} autoComplete="family-name" placeholder="Wijaya" />
+            <TextInput id="phone" label="Phone number" type="tel" className="sm:col-span-2" value={form.phone} onChange={(v) => setField('phone', v)} error={errors.phone} autoComplete="tel" placeholder="+62 812 3456 7890" />
+            <TextInput id="address" label="Full address" className="sm:col-span-2" value={form.address} onChange={(v) => setField('address', v)} error={errors.address} autoComplete="street-address" placeholder="Street, building, RT/RW, district" />
+            <TextInput id="city" label="City" value={form.city} onChange={(v) => setField('city', v)} error={errors.city} autoComplete="address-level2" placeholder="Jakarta Selatan" />
+            <TextInput id="zip" label="Zip code" inputMode="numeric" maxLength={5} value={form.zip} onChange={(v) => setField('zip', v.replace(/\D/g, ''))} error={errors.zip} autoComplete="postal-code" placeholder="12190" />
+          </div>
+        </section>
+      );
+    }
+
+    function Thumb({ product, size = 'h-14 w-14' }) {
+      return (
+        <img src={product.image.replace('w=800', 'w=200')} alt="" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = BM.fallback; }}
+             className={size + ' flex-shrink-0 rounded-lg object-cover'} style={{ objectPosition: product.pos || 'center' }} />
+      );
+    }
+
+    function ItemMeta({ line }) {
+      const p = line.product;
+      const parts = [p.type === 'bean' ? p.weight : p.capacity];
+      if (line.grind) parts.push(line.grind);
+      parts.push('Qty ' + line.qty);
+      return parts.join(' · ');
+    }
+
+    function DeliverySection({ groups, shipping, setShipping }) {
+      return (
+        <section aria-labelledby="sec-del">
+          <SectionTitle sub="Your items are coming from different roasteries/stores.">
+            <span id="sec-del">2. Delivery Options</span>
+          </SectionTitle>
+          <div className="space-y-5">
+            {groups.map((g, i) => (
+              <fieldset key={g.vendor.id} className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+                <legend className="sr-only">Delivery for package {i + 1}</legend>
+                <div className="flex items-center gap-3">
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-[#2C1E16]/5 text-[#2C1E16]"><Truck /></span>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[#2C1E16]">
+                    Package {i + 1} from {g.vendor.name.toUpperCase()} <span className="font-medium normal-case tracking-normal text-gray-500">({g.vendor.city})</span>
+                  </p>
+                </div>
+
+                <ul className="mt-4 space-y-3 rounded-xl bg-[#F9F8F6] p-3">
+                  {g.items.map((l) => (
+                    <li key={l.key} className="flex items-center gap-3">
+                      <Thumb product={l.product} size="h-12 w-12" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">{l.product.name}</p>
+                        <p className="text-xs text-gray-500"><ItemMeta line={l} /></p>
+                      </div>
+                      <p className="text-sm font-medium">{fmt(l.total)}</p>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-4 grid gap-3" role="radiogroup" aria-label={'Shipping method for ' + g.vendor.name}>
+                  {g.vendor.shipping.map((opt) => {
+                    const checked = shipping[g.vendor.id] === opt.id;
+                    return (
+                      <label key={opt.id}
+                        className={'flex cursor-pointer items-center justify-between gap-4 rounded-xl border px-4 py-3.5 text-sm transition duration-200 ' +
+                          (checked ? 'border-[#C45E3A] bg-[#C45E3A]/[0.05] shadow-sm' : 'border-gray-200 hover:border-gray-400')}>
+                        <span className="flex items-center gap-3">
+                          <input type="radio" className="peer sr-only" name={'ship-' + g.vendor.id} checked={checked} onChange={() => setShipping((s) => ({ ...s, [g.vendor.id]: opt.id }))} />
+                          <span className={'grid h-5 w-5 place-items-center rounded-full border-2 transition ' + (checked ? 'border-[#C45E3A]' : 'border-gray-300')}>
+                            <span className={'h-2.5 w-2.5 rounded-full bg-[#C45E3A] transition-transform ' + (checked ? 'scale-100' : 'scale-0')} />
+                          </span>
+                          <span className="font-medium">{opt.label}</span>
+                        </span>
+                        <span className="font-semibold">{fmt(opt.price)}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    const METHODS = [
+      { id: 'va', label: 'Virtual Account', hint: 'BCA, Mandiri, BNI', icon: <BankIcon /> },
+      { id: 'qris', label: 'QRIS', hint: 'GoPay, OVO, DANA, more', icon: <QrIcon /> },
+      { id: 'card', label: 'Credit Card', hint: 'Visa, Mastercard', icon: <CardIcon /> }
+    ];
+    const BANKS = ['BCA', 'Mandiri', 'BNI'];
+
+    function PaymentSection({ pay, setPay, card, setCardField, errors }) {
+      return (
+        <section aria-labelledby="sec-pay">
+          <SectionTitle><span id="sec-pay">3. Payment</span></SectionTitle>
+          <div className="grid gap-4 sm:grid-cols-3" role="radiogroup" aria-label="Payment method">
+            {METHODS.map((m) => {
+              const checked = pay.method === m.id;
+              return (
+                <label key={m.id} className={'relative flex cursor-pointer flex-col gap-3 rounded-xl border bg-white p-4 transition duration-200 ' +
+                  (checked ? 'border-[#C45E3A] shadow-md ring-1 ring-[#C45E3A]' : 'border-gray-200 hover:border-gray-400 hover:shadow-sm')}>
+                  <input type="radio" name="method" className="sr-only" checked={checked} onChange={() => setPay((p) => ({ ...p, method: m.id }))} />
+                  <span className={'transition-colors ' + (checked ? 'text-[#C45E3A]' : 'text-[#2C1E16]/70')}>{m.icon}</span>
+                  <span>
+                    <span className="block text-sm font-semibold">{m.label}</span>
+                    <span className="mt-0.5 block text-xs text-gray-500">{m.hint}</span>
+                  </span>
+                  <span className={'absolute right-3 top-3 grid h-5 w-5 place-items-center rounded-full bg-[#C45E3A] text-white transition ' + (checked ? 'scale-100 opacity-100' : 'scale-50 opacity-0')}><Check className="h-3 w-3" /></span>
+                </label>
+              );
+            })}
+          </div>
+
+          <div className="mt-5" key={pay.method}>
+            {pay.method === 'va' && (
+              <div className="fade-in rounded-xl border border-gray-200 bg-white p-5">
+                <p className="text-sm font-medium">Choose your bank</p>
+                <div className="mt-3 flex flex-wrap gap-2.5">
+                  {BANKS.map((b) => (
+                    <button type="button" key={b} onClick={() => setPay((p) => ({ ...p, bank: b }))}
+                      className={'rounded-lg border px-5 py-2 text-sm font-medium transition active:scale-95 ' + (pay.bank === b ? 'border-[#C45E3A] bg-[#C45E3A]/[0.06] text-[#C45E3A]' : 'border-gray-300 hover:border-gray-500')}>{b}</button>
+                  ))}
+                </div>
+                <p className="mt-3 text-xs text-gray-500">Your unique virtual account number will be shown after you place the order.</p>
+              </div>
+            )}
+            {pay.method === 'qris' && (
+              <div className="fade-in flex items-start gap-3 rounded-xl border border-gray-200 bg-white p-5 text-sm text-gray-600">
+                <span className="mt-0.5 text-[#C45E3A]"><QrIcon /></span>
+                <p>A QR code will appear after you tap <strong className="text-[#2C1E16]">Pay Now</strong>. Scan it with any e-wallet or mobile banking app. It stays valid for 30 minutes.</p>
+              </div>
+            )}
+            {pay.method === 'card' && (
+              <div className="fade-in grid gap-4 rounded-xl border border-gray-200 bg-white p-5 sm:grid-cols-2">
+                <TextInput id="cc-number" label="Card number" className="sm:col-span-2" inputMode="numeric" autoComplete="cc-number" placeholder="4242 4242 4242 4242" maxLength={19}
+                  value={card.number} onChange={(v) => setCardField('number', v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim())} error={errors.number} />
+                <TextInput id="cc-name" label="Name on card" className="sm:col-span-2" autoComplete="cc-name" placeholder="RANI WIJAYA"
+                  value={card.name} onChange={(v) => setCardField('name', v)} error={errors.name} />
+                <TextInput id="cc-exp" label="Expiry (MM/YY)" inputMode="numeric" autoComplete="cc-exp" placeholder="08/28" maxLength={5}
+                  value={card.exp} onChange={(v) => { const d = v.replace(/\D/g, '').slice(0, 4); setCardField('exp', d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d); }} error={errors.exp} />
+                <TextInput id="cc-cvc" label="CVC" inputMode="numeric" autoComplete="cc-csc" placeholder="123" maxLength={4}
+                  value={card.cvc} onChange={(v) => setCardField('cvc', v.replace(/\D/g, ''))} error={errors.cvc} />
+              </div>
+            )}
+          </div>
+        </section>
+      );
+    }
+
+    /* ---------- Order summary ---------- */
+    function OrderSummary({ groups, subtotal, shippingTotal, total, onPay, processing }) {
+      return (
+        <aside className="lg:sticky lg:top-8 lg:col-span-5" aria-label="Order summary">
+          <div className="rounded-2xl bg-white p-6 shadow-xl shadow-[#2C1E16]/5 ring-1 ring-black/[0.03] sm:p-8">
+            <h2 className="font-serif text-2xl font-semibold">Order Summary</h2>
+
+            <div className="mt-6 space-y-6">
+              {groups.map((g) => (
+                <div key={g.vendor.id}>
+                  <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-gray-500">
+                    <span className="h-px flex-1 bg-gray-200" /><span>{g.vendor.name}</span><span className="h-px flex-1 bg-gray-200" />
+                  </p>
+                  <ul className="space-y-4">
+                    {g.items.map((l) => (
+                      <li key={l.key} className="flex items-center gap-3">
+                        <div className="relative">
+                          <Thumb product={l.product} size="h-14 w-14" />
+                          <span className="absolute -right-2 -top-2 grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-[#2C1E16] px-1 text-[10px] font-semibold text-white">{l.qty}</span>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium">{l.product.name}</p>
+                          <p className="truncate text-xs text-gray-500">{l.grind || l.product.material}</p>
+                        </div>
+                        <p className="text-sm font-medium">{fmt(l.total)}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            <dl className="mt-8 space-y-3 border-t border-gray-200 pt-6 text-sm">
+              <div className="flex justify-between"><dt className="text-gray-600">Subtotal</dt><dd className="font-medium">{fmt(subtotal)}</dd></div>
+              <div className="flex justify-between"><dt className="text-gray-600">Shipping Fee (Combined)</dt><dd className="font-medium">{fmt(shippingTotal)}</dd></div>
+              <div className="flex justify-between"><dt className="text-gray-600">Platform Fee</dt><dd className="font-medium">{fmt(BM.PLATFORM_FEE)}</dd></div>
+            </dl>
+
+            <div className="mt-6 flex items-baseline justify-between border-t border-gray-200 pt-6">
+              <span className="text-base font-semibold">Grand Total</span>
+              <span className="font-serif text-3xl font-bold">{fmt(total)}</span>
+            </div>
+
+            <button type="button" onClick={onPay} disabled={processing}
+              className="mt-7 flex w-full items-center justify-center gap-2.5 rounded-xl bg-[#C45E3A] py-4 text-base font-semibold text-white shadow-lg shadow-[#C45E3A]/25 transition duration-300 hover:-translate-y-0.5 hover:bg-[#AD4F2E] hover:shadow-xl focus:outline-none focus-visible:ring-4 focus-visible:ring-[#C45E3A]/30 active:scale-[.98] disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0">
+              {processing ? (
+                <>
+                  <svg className="spinner h-5 w-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity=".3" strokeWidth="3" /><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
+                  Processing…
+                </>
+              ) : (<><Lock className="h-5 w-5" />Pay Now · {fmt(total)}</>)}
+            </button>
+
+            <p className="mt-5 flex items-start gap-2.5 text-xs leading-relaxed text-gray-500">
+              <Shield className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#7C9082]" />
+              Payments are processed securely via Escrow. Funds are only released to vendors once you receive your items.
+            </p>
+          </div>
+        </aside>
+      );
+    }
+
+    /* ---------- Success ---------- */
+    function Success({ order }) {
+      const methodLabel = { va: 'Virtual Account (' + order.bank + ')', qris: 'QRIS', card: 'Credit Card' }[order.method];
+      return (
+        <div className="mx-auto max-w-xl py-10 text-center fade-in">
+          <span className="pop mx-auto grid h-20 w-20 place-items-center rounded-full bg-[#7C9082]/20 text-[#4E6254]"><Check className="h-10 w-10" /></span>
+          <h1 className="mt-8 font-serif text-4xl font-semibold">Thank you, {order.name}!</h1>
+          <p className="mt-3 text-gray-600">Your payment is held safely in escrow. Each roastery has been notified and will ship separately.</p>
+
+          <div className="mt-10 rounded-2xl bg-white p-6 text-left shadow-xl shadow-[#2C1E16]/5 sm:p-8">
+            <div className="flex justify-between text-sm"><span className="text-gray-500">Order number</span><span className="font-semibold tracking-wide">{order.id}</span></div>
+            <div className="mt-3 flex justify-between text-sm"><span className="text-gray-500">Payment</span><span className="font-medium">{methodLabel}</span></div>
+            {order.method === 'va' && <div className="mt-3 flex justify-between text-sm"><span className="text-gray-500">Virtual account no.</span><span className="font-mono font-medium">8077 0812 3456 7890</span></div>}
+            <div className="mt-6 space-y-3 border-t border-gray-200 pt-6">
+              {order.groups.map((g) => (
+                <div key={g.vendor.id} className="flex items-center justify-between gap-3 text-sm">
+                  <span className="flex items-center gap-2"><Truck className="h-4 w-4 text-[#7C9082]" /><span><span className="font-medium">{g.vendor.name}</span> <span className="text-gray-500">· {g.shipLabel}</span></span></span>
+                  <span className="text-xs font-medium text-[#4E6254]">In escrow</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex items-baseline justify-between border-t border-gray-200 pt-6">
+              <span className="font-semibold">Total paid</span><span className="font-serif text-2xl font-bold">{fmt(order.total)}</span>
+            </div>
+          </div>
+          <a href="index.html" className="mt-8 inline-flex items-center justify-center rounded-xl bg-[#C45E3A] px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#C45E3A]/25 transition hover:-translate-y-0.5 hover:bg-[#AD4F2E] active:scale-95">Continue shopping</a>
+        </div>
+      );
+    }
+
+    /* ---------- App ---------- */
+    const validators = {
+      first: (v) => (v.trim() ? '' : 'Please enter your first name.'),
+      last: (v) => (v.trim() ? '' : 'Please enter your last name.'),
+      phone: (v) => (/^(\+?62|0)8\d{7,12}$/.test(v.replace(/[\s-]/g, '')) ? '' : 'Enter a valid Indonesian mobile number.'),
+      address: (v) => (v.trim().length >= 10 ? '' : 'Please enter your full address (street, number, district).'),
+      city: (v) => (v.trim() ? '' : 'Please enter your city.'),
+      zip: (v) => (/^\d{5}$/.test(v) ? '' : 'Zip code must be 5 digits.')
+    };
+    const cardValidators = {
+      number: (v) => (v.replace(/\s/g, '').length === 16 ? '' : 'Enter a 16-digit card number.'),
+      name: (v) => (v.trim() ? '' : 'Enter the name on your card.'),
+      exp: (v) => (/^(0[1-9]|1[0-2])\/\d{2}$/.test(v) ? '' : 'Use MM/YY.'),
+      cvc: (v) => (/^\d{3,4}$/.test(v) ? '' : '3–4 digits.')
+    };
+
+    function App() {
+      const groups = useMemo(() => BM.cart.grouped(), []);
+      const [form, setForm] = useState({ first: '', last: '', phone: '', address: '', city: '', zip: '' });
+      const [card, setCard] = useState({ number: '', name: '', exp: '', cvc: '' });
+      const [shipping, setShipping] = useState(() => Object.fromEntries(groups.map((g) => [g.vendor.id, g.vendor.shipping[0].id])));
+      const [pay, setPay] = useState({ method: 'va', bank: 'BCA' });
+      const [submitted, setSubmitted] = useState(false);
+      const [status, setStatus] = useState('idle');
+      const [order, setOrder] = useState(null);
+      const formRef = useRef(null);
+
+      const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+      const setCardField = (k, v) => setCard((c) => ({ ...c, [k]: v }));
+
+      const errors = useMemo(() => {
+        const e = {};
+        Object.keys(validators).forEach((k) => { const m = validators[k](form[k]); if (m) e[k] = m; });
+        return e;
+      }, [form]);
+      const cardErrors = useMemo(() => {
+        if (pay.method !== 'card') return {};
+        const e = {};
+        Object.keys(cardValidators).forEach((k) => { const m = cardValidators[k](card[k]); if (m) e[k] = m; });
+        return e;
+      }, [card, pay.method]);
+
+      const shipOpt = (g) => g.vendor.shipping.find((o) => o.id === shipping[g.vendor.id]) || g.vendor.shipping[0];
+      const subtotal = groups.reduce((s, g) => s + g.subtotal, 0);
+      const shippingTotal = groups.reduce((s, g) => s + shipOpt(g).price, 0);
+      const total = subtotal + shippingTotal + BM.PLATFORM_FEE;
+
+      /* errors are revealed after the first Pay attempt, then update live as the user types */
+      const shownErrors = submitted ? errors : {};
+      const shownCardErrors = submitted ? cardErrors : {};
+
+      const handlePay = () => {
+        setSubmitted(true);
+        if (Object.keys(errors).length || Object.keys(cardErrors).length) {
+          requestAnimationFrame(() => {
+            const bad = document.querySelector('[aria-invalid="true"]');
+            if (bad) { bad.scrollIntoView({ behavior: 'smooth', block: 'center' }); bad.focus({ preventScroll: true }); }
+          });
+          return;
+        }
+        setStatus('processing');
+        setTimeout(() => {
+          setOrder({
+            id: 'BM-' + Math.random().toString(36).slice(2, 8).toUpperCase(),
+            name: form.first.trim(), method: pay.method, bank: pay.bank, total,
+            groups: groups.map((g) => ({ vendor: g.vendor, shipLabel: shipOpt(g).label }))
+          });
+          BM.cart.clear();
+          setStatus('done');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 1800);
+      };
+
+      return (
+        <div className="min-h-screen">
+          <header className="border-b border-gray-200/80">
+            <div className="relative mx-auto flex h-20 max-w-6xl items-center justify-center px-8">
+              <a href="index.html" className="font-serif text-2xl font-bold tracking-tight text-[#2C1E16]">BrewMarket</a>
+              <div className="absolute right-8 hidden items-center gap-1.5 text-xs font-medium text-gray-600 sm:flex"><Lock /> Secure Checkout</div>
+            </div>
+            <div className="flex items-center justify-center gap-1.5 pb-3 text-xs font-medium text-gray-600 sm:hidden"><Lock /> Secure Checkout</div>
+          </header>
+
+          <main className="mx-auto max-w-6xl px-8 py-10 lg:py-14">
+            {status === 'done' ? <Success order={order} /> : groups.length === 0 ? (
+              <div className="mx-auto max-w-md py-24 text-center fade-in">
+                <h1 className="font-serif text-3xl font-semibold">Your cart is empty</h1>
+                <p className="mt-3 text-gray-600">Add some freshly roasted beans or gear before checking out.</p>
+                <a href="index.html#catalog" className="mt-8 inline-flex rounded-xl bg-[#C45E3A] px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-[#AD4F2E] active:scale-95">Back to catalog</a>
+              </div>
+            ) : (
+              <>
+                <a href="index.html" className="mb-10 inline-flex items-center gap-2 text-sm text-gray-600 transition hover:text-[#2C1E16]">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m15 6-6 6 6 6" /></svg>
+                  Continue shopping
+                </a>
+                <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+                  <div ref={formRef} className="space-y-12 lg:col-span-7">
+                    <ShippingSection form={form} setField={setField} errors={shownErrors} />
+                    <hr className="border-gray-200" />
+                    <DeliverySection groups={groups} shipping={shipping} setShipping={setShipping} />
+                    <hr className="border-gray-200" />
+                    <PaymentSection pay={pay} setPay={setPay} card={card} setCardField={setCardField} errors={shownCardErrors} />
+                  </div>
+                  <OrderSummary groups={groups} subtotal={subtotal} shippingTotal={shippingTotal} total={total} onPay={handlePay} processing={status === 'processing'} />
+                </div>
+              </>
+            )}
+          </main>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
