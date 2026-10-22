@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us — KopiKonek | Specialty Coffee & Community Hub</title>
+  <link rel="icon" type="image/png" href="assets/logo-mark.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: '#F9F8F6',
+            taupe: '#EDE8E1',
+            espresso: '#2C1E16',
+            charcoal: '#4A433E',
+            rust: '#C45E3A',
+            terracotta: '#CC5500',
+            sage: '#7C9082',
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body class="bg-cream text-espresso font-sans antialiased selection:bg-terracotta/20 selection:text-espresso">
+
+  <!-- Top Announcement Bar -->
+  <div class="bg-espresso text-cream text-xs tracking-wide py-2.5 px-4 text-center">
+    <span class="inline-block w-2 h-2 rounded-full bg-sage mr-2 align-middle"></span>
+    <strong>KopiKonek Story &amp; Community Hub</strong> — Connecting Archipelago Roasters &amp; Home Brewers Across Indonesia.
+  </div>
+
+  <!-- Header & Navigation -->
+  <header class="sticky top-0 z-30 bg-cream/95 backdrop-blur-md border-b border-espresso/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-3 group shrink-0">
+        <img
+          src="assets/logo-mark.png"
+          alt="KopiKonek Logo"
+          class="w-11 h-11 rounded-xl object-contain bg-taupe/60 p-1 border border-espresso/10 shadow-sm group-hover:scale-105 transition"
+        />
+        <span class="font-serif text-2xl font-semibold tracking-tight text-espresso">KopiKonek</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-charcoal">
+        <a href="index.html#catalog" class="hover:text-terracotta transition">Coffee Beans</a>
+        <a href="index.html#catalog" class="hover:text-terracotta transition">Brewing Gear</a>
+        <a href="index.html#roasteries" class="hover:text-terracotta transition">Roasteries</a>
+        <a href="about.html" class="text-terracotta font-semibold border-b-2 border-terracotta pb-0.5">About Us</a>
+        <a href="#community-hub" class="hover:text-terracotta transition">Community Hub</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <!-- Dynamic Seller Dashboard Button (Visible when logged in as Partner / Roaster) -->
+        <a
+          id="navSellerDashboard"
+          href="dashboard.html"
+          class="hidden items-center gap-2 px-4 py-2 rounded-full bg-terracotta text-cream text-xs font-semibold hover:bg-espresso transition shadow-sm"
+        >
+          <span class="w-2 h-2 rounded-full bg-amber-200 animate-pulse"></span>
+          Seller Dashboard
+        </a>
+
+        <a
+          id="navAuthSlot"
+          href="login.html"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-espresso/15 bg-white/80 hover:bg-espresso hover:text-cream text-xs font-semibold text-espresso transition"
+        >
+          Sign In
+        </a>
+
+        <a
+          href="index.html"
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-espresso text-cream text-xs font-semibold hover:bg-terracotta transition"
+        >
+          Explore Catalog →
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Story Section with Official Logo & Exact User Description -->
+    <section class="relative overflow-hidden py-16 sm:py-24 border-b border-espresso/10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <!-- Left Column: Brand Story & Exact Description -->
+          <div class="lg:col-span-7 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-taupe text-espresso text-xs font-semibold uppercase tracking-widest">
+              <span class="w-2 h-2 rounded-full bg-terracotta"></span>
+              Our Origin Story · About KopiKonek
+            </div>
+
+            <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-espresso leading-[1.12]">
+              Born from a Passion for <span class="italic text-terracotta">Better Beans</span> &amp; Shared Brews.
+            </h1>
+
+            <!-- Exact Story Quote Card requested by user -->
+            <blockquote class="relative bg-white rounded-3xl p-7 sm:p-9 border-l-4 border-l-terracotta border border-espresso/10 shadow-md">
+              <svg class="w-9 h-9 text-terracotta/25 mb-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+              </svg>
+              <p class="font-serif text-xl sm:text-2xl text-espresso leading-relaxed">
+                “It all started when we struggled to find the right beans and brewing guides at the beginning of our coffee journey. Inspired by this challenge, we created KopiKonek a platform designed to help coffee lovers discover the perfect beans and master the art of brewing. KopiKonek also serves as a community hub where fellow brewers can connect and share their coffee making experiences.”
+              </p>
+              <footer class="mt-5 pt-4 border-t border-espresso/10 flex flex-wrap items-center justify-between gap-2 text-xs text-charcoal/80">
+                <span class="font-semibold text-espresso">— The Founders of KopiKonek</span>
+                <span class="px-2.5 py-1 rounded-full bg-sage/20 text-espresso font-medium">
+                  Roastery Marketplace · Brew Guides · Community Hub
+                </span>
+              </footer>
+            </blockquote>
+
+            <div class="flex flex-wrap items-center gap-4 pt-2">
+              <a
+                href="index.html#catalog"
+                class="inline-flex items-center gap-2.5 bg-terracotta hover:bg-espresso text-cream font-medium px-7 py-3.5 rounded-full transition shadow-sm"
+              >
+                <span>Discover Fresh Beans</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </a>
+              <a
+                href="#community-hub"
+                class="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-espresso/20 hover:border-espresso bg-white/80 text-espresso font-medium transition"
+              >
+                Join the Community Hub
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Column: Official KopiKonek Brand Identity Card -->
+          <div class="lg:col-span-5">
+            <div class="relative bg-taupe/60 rounded-3xl p-8 sm:p-10 border border-espresso/15 shadow-xl text-center">
+              <div class="bg-[#F7F3EB] rounded-2xl p-6 sm:p-8 border border-espresso/10 shadow-inner flex flex-col items-center justify-center">
+                <img
+                  src="assets/logo.png"
+                  alt="KopiKonek Official Brand Logo"
+                  class="w-64 sm:w-72 h-auto object-contain mx-auto drop-shadow-sm"
+                />
+              </div>
+
+              <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+                <div class="bg-white/90 rounded-2xl p-3.5 border border-espresso/10">
+                  <div class="font-serif text-2xl font-bold text-espresso">28+</div>
+                  <div class="text-[11px] text-charcoal/75 mt-0.5">Partner Roasteries</div>
+                </div>
+                <div class="bg-white/90 rounded-2xl p-3.5 border border-espresso/10">
+                  <div class="font-serif text-2xl font-bold text-terracotta">100%</div>
+                  <div class="text-[11px] text-charcoal/75 mt-0.5">Roast Date Verified</div>
+                </div>
+                <div class="bg-white/90 rounded-2xl p-3.5 border border-espresso/10">
+                  <div class="font-serif text-2xl font-bold text-espresso">14K+</div>
+                  <div class="text-[11px] text-charcoal/75 mt-0.5">Home Brewers</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Three Pillars Derived from the Story -->
+    <section class="py-16 sm:py-20 bg-taupe/45 border-b border-espresso/10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <span class="text-xs font-semibold uppercase tracking-widest text-terracotta">How KopiKonek Works</span>
+          <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-espresso mt-1">
+            Three Pillars of Our Coffee Journey
+          </h2>
+          <p class="text-sm text-charcoal/80 mt-2">
+            Turning the struggle of finding the right beans and brewing guides into an effortless, joyful ritual.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-7">
+          <!-- Pillar 1 -->
+          <div class="bg-white rounded-3xl p-7 border border-espresso/10 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-2xl bg-terracotta/15 text-terracotta flex items-center justify-center font-serif text-xl font-bold">
+                01
+              </div>
+              <h3 class="font-serif text-2xl font-semibold text-espresso mt-5">
+                Discover the Perfect Beans
+              </h3>
+              <p class="text-sm text-charcoal/80 mt-2.5 leading-relaxed">
+                No more guessing how long a bag has been sitting on a supermarket shelf. Every coffee bean on KopiKonek displays a transparent <strong>Roast Date</strong>, origin altitude, post-harvest process, and visual flavor profile bars for Acidity, Body, and Sweetness.
+              </p>
+            </div>
+            <a href="index.html#catalog" class="inline-flex items-center gap-1.5 text-xs font-semibold text-terracotta hover:text-espresso mt-6">
+              Browse Single Origins &amp; Blends →
+            </a>
+          </div>
+
+          <!-- Pillar 2 -->
+          <div class="bg-white rounded-3xl p-7 border border-espresso/10 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-2xl bg-sage/25 text-espresso flex items-center justify-center font-serif text-xl font-bold">
+                02
+              </div>
+              <h3 class="font-serif text-2xl font-semibold text-espresso mt-5">
+                Master the Art of Brewing
+              </h3>
+              <p class="text-sm text-charcoal/80 mt-2.5 leading-relaxed">
+                From choosing the right <strong>Grind Size</strong> (Whole Bean, Coarse French Press, Medium V60, or Fine Espresso) to using our interactive <strong>Brew Matchmaker</strong>, we help beginners and seasoned baristas dial in every pour with confidence.
+              </p>
+            </div>
+            <a href="index.html#matchmaker" class="inline-flex items-center gap-1.5 text-xs font-semibold text-terracotta hover:text-espresso mt-6">
+              Try the Brew Matchmaker →
+            </a>
+          </div>
+
+          <!-- Pillar 3 -->
+          <div class="bg-white rounded-3xl p-7 border border-espresso/10 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-2xl bg-espresso text-cream flex items-center justify-center font-serif text-xl font-bold">
+                03
+              </div>
+              <h3 class="font-serif text-2xl font-semibold text-espresso mt-5">
+                Connect &amp; Share Experiences
+              </h3>
+              <p class="text-sm text-charcoal/80 mt-2.5 leading-relaxed">
+                KopiKonek is more than a marketplace—it is a <strong>community hub</strong> where home brewers and roasters exchange V60 recipes, water temperatures, pour intervals, and honest tasting notes from across the archipelago.
+              </p>
+            </div>
+            <a href="#community-hub" class="inline-flex items-center gap-1.5 text-xs font-semibold text-terracotta hover:text-espresso mt-6">
+              Explore Community Brew Logs ↓
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Community Hub Section -->
+    <section id="community-hub" class="py-16 sm:py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-widest text-terracotta">
+              KopiKonek Community Hub
+            </span>
+            <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-espresso mt-1">
+              Fellow Brewers Sharing Their Coffee Experiences
+            </h2>
+            <p class="text-sm text-charcoal/80 mt-1.5 max-w-2xl">
+              Real recipes, brewing notes, and daily rituals shared by members of the KopiKonek community. Share your own brew log below!
+            </p>
+          </div>
+          <button
+            id="toggleShareFormBtn"
+            type="button"
+            class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-espresso hover:bg-terracotta text-cream text-xs sm:text-sm font-semibold transition self-start lg:self-auto"
+          >
+            + Share Your Brew Experience
+          </button>
+        </div>
+
+        <!-- Collapsible Share Brew Experience Form -->
+        <form
+          id="shareBrewForm"
+          class="hidden mb-10 bg-white rounded-3xl p-6 sm:p-8 border border-espresso/15 shadow-md space-y-4"
+        >
+          <div class="flex items-center justify-between pb-3 border-b border-espresso/10">
+            <h3 class="font-serif text-xl font-semibold text-espresso">Share Your Brewing Recipe &amp; Experience</h3>
+            <span class="text-xs text-charcoal/70">Posted live to the Community Hub</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-espresso mb-1">Your Name *</label>
+              <input id="brewAuthor" type="text" required placeholder="e.g., Raka Pratama (Bandung)" class="w-full px-3.5 py-2.5 rounded-xl bg-cream border border-espresso/20 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-espresso mb-1">Coffee Bean Used *</label>
+              <input id="brewBean" type="text" required placeholder="e.g., West Java Kamojang — Kala Roastery" class="w-full px-3.5 py-2.5 rounded-xl bg-cream border border-espresso/20 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-espresso mb-1">Brew Method &amp; Ratio *</label>
+              <input id="brewMethod" type="text" required placeholder="e.g., Hario V60 · 15g : 225ml @ 92°C" class="w-full px-3.5 py-2.5 rounded-xl bg-cream border border-espresso/20 text-sm" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-espresso mb-1">Your Tasting Notes &amp; Experience *</label>
+            <textarea id="brewNotes" rows="3" required placeholder="Tell fellow brewers how it tasted and any tips you discovered..." class="w-full px-3.5 py-2.5 rounded-xl bg-cream border border-espresso/20 text-sm"></textarea>
+          </div>
+          <div class="flex justify-end gap-3">
+            <button type="submit" class="px-6 py-2.5 rounded-full bg-terracotta hover:bg-espresso text-cream text-xs font-semibold transition">
+              Publish to Community Hub
+            </button>
+          </div>
+        </form>
+
+        <!-- Community Brew Logs Grid -->
+        <div id="communityFeedGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-espresso text-cream/85 py-12 px-4 sm:px-6 lg:px-8 border-t border-white/10">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <img src="assets/logo-mark.png" alt="KopiKonek" class="w-10 h-10 rounded-xl bg-cream p-1 object-contain" />
+        <div>
+          <span class="font-serif text-xl font-semibold text-cream">KopiKonek</span>
+          <p class="text-xs text-cream/65">Discover the perfect beans · Master the art of brewing · Connect with fellow brewers.</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-6 text-xs">
+        <a href="index.html" class="hover:text-white transition">Marketplace</a>
+        <a href="about.html" class="text-terracotta font-semibold">About Us</a>
+        <a href="dashboard.html" class="hover:text-white transition">Partner Dashboard</a>
+        <a href="login.html" class="hover:text-white transition">Sign In</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/data.js"></script>
+  <script>
+    (function () {
+      // Render auth state & Partner Seller Dashboard button
+      function syncNavAuth() {
+        var u = window.BM && BM.auth ? BM.auth.user() : null;
+        var sellerBtn = document.getElementById('navSellerDashboard');
+        var authSlot = document.getElementById('navAuthSlot');
+        if (sellerBtn) {
+          if (u && u.role === 'roaster') {
+            sellerBtn.classList.remove('hidden');
+            sellerBtn.classList.add('inline-flex');
+          } else {
+            sellerBtn.classList.add('hidden');
+            sellerBtn.classList.remove('inline-flex');
+          }
+        }
+        if (authSlot && u) {
+          authSlot.textContent = (u.roasteryName || u.firstName || u.name) + (u.role === 'roaster' ? ' (Partner)' : '');
+          authSlot.href = u.role === 'roaster' ? 'dashboard.html' : 'index.html';
+        }
+      }
+      syncNavAuth();
+
+      // Community Brew Logs Feed
+      var FEED_KEY = 'kopikonek_community_posts_v1';
+      var defaultPosts = [
+        {
+          author: 'Rani Wijaya · Jakarta Selatan',
+          badge: 'Home Brewer',
+          bean: 'West Java Kamojang — Kala Roastery',
+          method: 'Hario V60 Ceramic 02 · 15g : 240ml @ 91°C',
+          notes: 'Rested 5 days after Kala Roastery’s roast date. Blooming 40ml for 35s unlocked super bright mandarin citrus and a clean brown-sugar finish!',
+          likes: 28
+        },
+        {
+          author: 'Arif Santoso · Kala Roastery Bandung',
+          badge: 'Roaster Partner',
+          bean: 'Midnight Crema Blend (Fresh Batch)',
+          method: 'Espresso 18g in → 36g out in 29s @ 93°C',
+          notes: 'For milk drinks, pull slightly shorter (1:1.8) after 7 days post-roast to highlight the dark cacao and toasted hazelnut body.',
+          likes: 42
+        },
+        {
+          author: 'Dimas Prakoso · Surabaya',
+          badge: 'Manual Brew Enthusiast',
+          bean: 'Flores Bajawa Honey — Tanah Roast',
+          method: 'Origami Dripper · Kalita Wave Filter · 1:15.5',
+          notes: 'Switching to a flat-bottom filter boosted the caramel sweetness and juicy plum notes. Highly recommend grinding slightly coarser on the Timemore C3.',
+          likes: 19
+        }
+      ];
+
+      function getPosts() {
+        try {
+          var raw = localStorage.getItem(FEED_KEY);
+          return raw ? JSON.parse(raw) : defaultPosts;
+        } catch (e) { return defaultPosts; }
+      }
+
+      function renderFeed() {
+        var grid = document.getElementById('communityFeedGrid');
+        if (!grid) return;
+        var posts = getPosts();
+        grid.innerHTML = posts.map(function (p) {
+          return (
+            '<article class="bg-white rounded-3xl p-6 border border-espresso/10 shadow-sm flex flex-col justify-between">' +
+              '<div>' +
+                '<div class="flex items-center justify-between gap-2">' +
+                  '<span class="text-xs font-bold text-espresso">' + p.author + '</span>' +
+                  '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-taupe text-espresso">' + p.badge + '</span>' +
+                '</div>' +
+                '<div class="mt-3 p-3 rounded-2xl bg-cream border border-espresso/10 text-xs space-y-1">' +
+                  '<div class="font-semibold text-terracotta">☕ ' + p.bean + '</div>' +
+                  '<div class="text-charcoal/80">⚙️ ' + p.method + '</div>' +
+                '</div>' +
+                '<p class="text-sm text-charcoal/90 mt-3.5 leading-relaxed">“' + p.notes + '”</p>' +
+              '</div>' +
+              '<div class="mt-4 pt-3 border-t border-espresso/10 flex items-center justify-between text-xs text-charcoal/70">' +
+                '<span>Verified Community Brew Log</span>' +
+                '<span class="font-semibold text-espresso">♥ ' + (p.likes || 12) + ' Brewers helped</span>' +
+              '</div>' +
+            '</article>'
+          );
+        }).join('');
+      }
+      renderFeed();
+
+      var toggleBtn = document.getElementById('toggleShareFormBtn');
+      var form = document.getElementById('shareBrewForm');
+      if (toggleBtn && form) {
+        toggleBtn.addEventListener('click', function () {
+          form.classList.toggle('hidden');
+        });
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var author = document.getElementById('brewAuthor').value.trim();
+          var bean = document.getElementById('brewBean').value.trim();
+          var method = document.getElementById('brewMethod').value.trim();
+          var notes = document.getElementById('brewNotes').value.trim();
+          if (!author || !bean || !method || !notes) return;
+          var list = getPosts();
+          list.unshift({
+            author: author,
+            badge: 'Community Member',
+            bean: bean,
+            method: method,
+            notes: notes,
+            likes: 1
+          });
+          try { localStorage.setItem(FEED_KEY, JSON.stringify(list)); } catch (err) {}
+          form.reset();
+          form.classList.add('hidden');
+          renderFeed();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

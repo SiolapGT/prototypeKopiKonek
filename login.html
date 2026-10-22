@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sign In — KopiKonek</title>
+  <link rel="icon" type="image/png" href="assets/logo-mark.png" />
   <meta name="description" content="Sign in or create your KopiKonek account to track fresh roast drops, save your grind preferences, and manage multi-vendor coffee orders." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -169,7 +170,7 @@
           setLoading(false);
           setToastMsg(message || ('Welcome back, ' + userObj.firstName + '!'));
           setTimeout(() => {
-            window.location.href = redirectUrl;
+            window.location.href = (userObj && userObj.role === 'roaster' && redirectUrl === 'index.html') ? 'dashboard.html' : redirectUrl;
           }, 700);
         }, 650);
       };
@@ -274,13 +275,9 @@
                 <span className="sm:hidden">Back</span>
               </a>
 
-              <a href="index.html" className="flex items-center gap-2 font-serif text-2xl font-bold tracking-tight">
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-espresso text-cream">
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C7 5 4.5 9 6 14c1.2 4 5 7 6 8 1-1 4.8-4 6-8 1.5-5-1-9-6-12Zm-.2 5.2c1.8 2.3 1.8 5.3.4 9.6-.2.6-1 .6-.8-.1 1-3.6 1-6.2.4-9.5Z" />
-                  </svg>
-                </span>
-                KopiKonek
+              <a href="index.html" className="flex items-center gap-2.5 font-serif text-2xl font-bold tracking-tight">
+                <img src="assets/logo-mark.png" alt="KopiKonek Logo" className="h-10 w-10 rounded-xl border border-espresso/10 bg-taupe/60 p-1 object-contain shadow-sm" />
+                <span>KopiKonek</span>
               </a>
 
               <div className="flex items-center gap-1.5 text-xs font-medium text-espresso/60">
@@ -386,6 +383,11 @@
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        {currentUser.role === 'roaster' && (
+                          <a href="dashboard.html" className="rounded-full bg-terracotta px-4 py-2 text-xs font-semibold text-white transition hover:bg-espresso">
+                            Seller Dashboard →
+                          </a>
+                        )}
                         <a href={redirectUrl} className="rounded-full bg-espresso px-4 py-2 text-xs font-semibold text-cream transition hover:bg-espresso/90">
                           Continue to {redirectLabel} →
                         </a>

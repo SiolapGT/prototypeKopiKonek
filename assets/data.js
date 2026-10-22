@@ -1,12 +1,16 @@
-/* KopiKonek — shared catalog, vendors, cart & auth store (used by index.html, login.html & checkout.html) */
+/* KopiKonek — shared catalog, vendors, cart, auth & partner store (used across all pages) */
 (function () {
   'use strict';
 
   /* The prototype pretends "today" is this date so roast-date labels stay consistent. */
   var PROTOTYPE_TODAY = new Date(2026, 9, 14);
+  var TODAY_ISO = '2026-10-14';
   var PLATFORM_FEE = 2500;
   var CART_KEY = 'kopikonek_cart_v1';
   var AUTH_KEY = 'kopikonek_user_v1';
+  var PATCH_KEY = 'kopikonek_product_patches_v1';
+  var CUSTOM_PRODUCTS_KEY = 'kopikonek_custom_products_v1';
+  var ORDERS_KEY = 'kopikonek_partner_orders_v1';
 
   var FALLBACK_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
@@ -36,33 +40,33 @@
     bajawa:   { id: 'bajawa',   name: 'Bajawa Atelier',  city: 'Bajawa',    region: 'Bajawa, Flores',           initials: 'BA', color: ['#6B6F7A', '#34363D'], roastery: true, shipping: [] }
   };
 
-  /* ---------- Products ---------- */
-  var products = [
-    { id: 'kamojang', type: 'bean', cat: 'single', vendor: 'kala', name: 'West Java Kamojang', price: 95000, weight: '250g',
+  /* ---------- Base Products ---------- */
+  var baseProducts = [
+    { id: 'kamojang', type: 'bean', cat: 'single', vendor: 'kala', name: 'West Java Kamojang', price: 95000, weight: '250g', stock: 34,
       origin: 'West Java', roast: 'Light', notes: ['Fruity', 'Caramel'], roastDate: '2026-10-01',
       profile: { acidity: 80, body: 55, sweetness: 70 }, image: img('1559056199-641a0ac8b55e'),
       desc: 'Volcanic-soil Arabica from the Kamojang highlands. Bright citrus acidity up front, finishing with a soft caramel sweetness.' },
-    { id: 'gayo', type: 'bean', cat: 'single', vendor: 'gayo', name: 'Gayo Highland Washed', price: 110000, weight: '250g',
+    { id: 'gayo', type: 'bean', cat: 'single', vendor: 'gayo', name: 'Gayo Highland Washed', price: 110000, weight: '250g', stock: 28,
       origin: 'Aceh Gayo', roast: 'Medium', notes: ['Dark Chocolate', 'Spice'], roastDate: '2026-10-08',
       profile: { acidity: 50, body: 85, sweetness: 60 }, image: img('1447933601403-0c6688de566e'),
       desc: 'A full-bodied, syrupy cup from Takengon. Cocoa-forward with a gentle spice finish that holds beautifully with milk.' },
-    { id: 'flores', type: 'bean', cat: 'single', vendor: 'tanah', name: 'Flores Bajawa Natural', price: 105000, weight: '250g',
+    { id: 'flores', type: 'bean', cat: 'single', vendor: 'tanah', name: 'Flores Bajawa Natural', price: 105000, weight: '250g', stock: 19,
       origin: 'Flores', roast: 'Medium', notes: ['Caramel', 'Nutty'], roastDate: '2026-10-10',
       profile: { acidity: 55, body: 70, sweetness: 80 }, image: img('1587734195503-904fca47e0e9'),
       desc: 'Naturally processed beans from the Bajawa highlands — round, sweet and nutty, with a clean brown-sugar finish.' },
-    { id: 'toraja', type: 'bean', cat: 'single', vendor: 'tanah', name: 'Toraja Sapan Honey', price: 135000, weight: '200g',
+    { id: 'toraja', type: 'bean', cat: 'single', vendor: 'tanah', name: 'Toraja Sapan Honey', price: 135000, weight: '200g', stock: 15,
       origin: 'Toraja', roast: 'Light', notes: ['Floral', 'Berry'], roastDate: '2026-10-12',
       profile: { acidity: 85, body: 45, sweetness: 75 }, image: img('1514432324607-a09d9b4aefdd'),
       desc: 'A delicate honey-processed lot with jasmine aromatics and ripe berry sweetness. Best brewed as a slow pour-over.' },
-    { id: 'midnight', type: 'bean', cat: 'blend', vendor: 'kala', name: 'Midnight Crema Blend', price: 125000, weight: '500g',
+    { id: 'midnight', type: 'bean', cat: 'blend', vendor: 'kala', name: 'Midnight Crema Blend', price: 125000, weight: '500g', stock: 42,
       origin: 'Java + Sumatra', roast: 'Dark', notes: ['Cocoa', 'Roasted Almond'], roastDate: '2026-10-09',
       profile: { acidity: 30, body: 90, sweetness: 55 }, image: img('1610889556528-9a770e32642f'),
       desc: 'Our espresso workhorse: thick crema, bittersweet cocoa and a lingering roasted-almond finish. Built for milk drinks.' },
-    { id: 'sunrise', type: 'bean', cat: 'blend', vendor: 'tanah', name: 'Sunrise Espresso Blend', price: 115000, weight: '250g',
+    { id: 'sunrise', type: 'bean', cat: 'blend', vendor: 'tanah', name: 'Sunrise Espresso Blend', price: 115000, weight: '250g', stock: 24,
       origin: 'Flores + Toraja', roast: 'Medium', notes: ['Brown Sugar', 'Orange Zest'], roastDate: '2026-10-11',
       profile: { acidity: 65, body: 70, sweetness: 78 }, image: img('1511920170033-f8396924c348'),
       desc: 'A brighter, sweeter espresso with orange-zest lift and brown-sugar depth. Stunning straight or with a splash of milk.' },
-    { id: 'coldbrew', type: 'bean', cat: 'blend', vendor: 'gayo', name: 'Cold Brew House Blend', price: 98000, weight: '500g',
+    { id: 'coldbrew', type: 'bean', cat: 'blend', vendor: 'gayo', name: 'Cold Brew House Blend', price: 98000, weight: '500g', stock: 30,
       origin: 'Aceh + Bali', roast: 'Medium', notes: ['Chocolate', 'Cherry'], roastDate: '2026-10-06',
       profile: { acidity: 40, body: 75, sweetness: 85 }, image: img('1461023058943-07fcbe16d735'),
       desc: 'Coarse-ground friendly and naturally sweet. Steep for 16 hours for a smooth, chocolate-cherry concentrate.' },
@@ -84,8 +88,107 @@
       desc: 'Flat 54mm burrs and 40 stepped settings. Consistent, quiet and fast — for espresso to French press.' }
   ];
 
+  function readPatches() {
+    try { return JSON.parse(localStorage.getItem(PATCH_KEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function writePatches(p) {
+    try { localStorage.setItem(PATCH_KEY, JSON.stringify(p)); } catch (e) {}
+  }
+  function readCustomProducts() {
+    try { return JSON.parse(localStorage.getItem(CUSTOM_PRODUCTS_KEY) || '[]') || []; } catch (e) { return []; }
+  }
+  function writeCustomProducts(list) {
+    try { localStorage.setItem(CUSTOM_PRODUCTS_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+
+  var products = [];
   var productMap = {};
-  products.forEach(function (p) { productMap[p.id] = p; });
+
+  function rebuildCatalog() {
+    var patches = readPatches();
+    var customs = readCustomProducts();
+    products.length = 0;
+    Object.keys(productMap).forEach(function (k) { delete productMap[k]; });
+
+    baseProducts.forEach(function (bp) {
+      var copy = Object.assign({ altitude: '1,550m', process: 'Full Washed' }, bp, patches[bp.id] || {});
+      copy.vendorId = copy.vendor;
+      copy.category = copy.cat === 'blend' ? 'espresso' : 'single-origin';
+      products.push(copy);
+      productMap[copy.id] = copy;
+    });
+    customs.forEach(function (cp) {
+      var copy = Object.assign({ altitude: '1,650m', process: 'Honey Process' }, cp, patches[cp.id] || {});
+      copy.vendorId = copy.vendor;
+      copy.category = copy.cat === 'blend' ? 'espresso' : 'single-origin';
+      products.unshift(copy);
+      productMap[copy.id] = copy;
+    });
+  }
+  rebuildCatalog();
+
+  var catalog = {
+    list: function () { rebuildCatalog(); return products.slice(); },
+    byVendor: function (vendorId) {
+      rebuildCatalog();
+      return products.filter(function (p) { return p.vendor === vendorId; });
+    },
+    updateBean: function (id, patch) {
+      var patches = readPatches();
+      patches[id] = Object.assign({}, patches[id] || {}, patch);
+      writePatches(patches);
+      rebuildCatalog();
+      document.dispatchEvent(new CustomEvent('catalog:change'));
+      return productMap[id];
+    },
+    addBean: function (beanData) {
+      var customs = readCustomProducts();
+      var parsedNotes = Array.isArray(beanData.notes)
+        ? beanData.notes
+        : String(beanData.notes || 'Floral, Sweet Citrus')
+            .split(',')
+            .map(function (s) { return s.trim(); })
+            .filter(Boolean);
+      var catVal = (beanData.cat === 'blend' || beanData.category === 'espresso') ? 'blend' : 'single';
+      var newBean = {
+        id: 'bean-' + Date.now().toString(36),
+        type: 'bean',
+        cat: catVal,
+        category: catVal === 'blend' ? 'espresso' : 'single-origin',
+        vendor: beanData.vendor || beanData.vendorId || 'kala',
+        vendorId: beanData.vendor || beanData.vendorId || 'kala',
+        name: beanData.name || 'New Micro-Lot Arabica',
+        price: Number(beanData.price) || 115000,
+        weight: beanData.weight || '250g',
+        stock: Number(beanData.stock) || 25,
+        origin: beanData.origin || 'West Java',
+        altitude: beanData.altitude || '1,650m',
+        process: beanData.process || 'Honey Process',
+        roast: beanData.roast === 'Medium-Dark' ? 'Dark' : (beanData.roast || 'Light'),
+        notes: parsedNotes.length ? parsedNotes : ['Floral', 'Sweet Citrus'],
+        roastDate: beanData.roastDate || TODAY_ISO,
+        profile: beanData.profile || {
+          acidity: Number(beanData.acidity) || 75,
+          body: Number(beanData.body) || 60,
+          sweetness: Number(beanData.sweetness) || 80
+        },
+        image: beanData.image || img('1559056199-641a0ac8b55e'),
+        desc: beanData.desc || beanData.description || 'Small-batch seasonal lot roasted fresh to order with vibrant aromatics and clean sweetness.',
+        isCustom: true
+      };
+      customs.push(newBean);
+      writeCustomProducts(customs);
+      rebuildCatalog();
+      document.dispatchEvent(new CustomEvent('catalog:change'));
+      return newBean;
+    },
+    deleteBean: function (id) {
+      var customs = readCustomProducts().filter(function (c) { return c.id !== id; });
+      writeCustomProducts(customs);
+      rebuildCatalog();
+      document.dispatchEvent(new CustomEvent('catalog:change'));
+    }
+  };
 
   /* ---------- Helpers ---------- */
   function fmt(n) { return 'Rp ' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
@@ -135,6 +238,7 @@
     clear: function () { writeCart([]); },
     /* Items grouped per vendor (one "package" each) with default shipping = first option. */
     grouped: function () {
+      rebuildCatalog();
       var order = [], map = {};
       readCart().forEach(function (i) {
         var p = productMap[i.id]; if (!p) return;
@@ -146,6 +250,152 @@
       return order.map(function (v) {
         var g = map[v]; g.shippingOption = g.vendor.shipping[0] || { id: 'regular', label: 'Regular', price: 15000 }; return g;
       });
+    }
+  };
+
+  /* ---------- Partner Orders & Escrow Store (localStorage) ---------- */
+  var SEED_ORDERS = [
+    {
+      id: 'KK-9482A1',
+      date: '2026-10-14',
+      buyerName: 'Rani Wijaya',
+      buyerCity: 'Jakarta Selatan',
+      buyerPhone: '0812-3456-7890',
+      shippingService: 'Regular (2-3 days)',
+      shippingFee: 15000,
+      subtotal: 190000,
+      paymentMethod: 'Virtual Account (BCA)',
+      status: 'escrow_pending', // 'escrow_pending' | 'escrow_shipped' | 'released'
+      trackingNo: '',
+      items: [
+        { productId: 'kamojang', name: 'West Java Kamojang', qty: 2, weight: '250g', grind: 'Medium / V60', price: 95000 }
+      ]
+    },
+    {
+      id: 'KK-8841F3',
+      date: '2026-10-14',
+      buyerName: 'Nadia Putri',
+      buyerCity: 'Bandung',
+      buyerPhone: '0813-9876-5432',
+      shippingService: 'Next Day',
+      shippingFee: 25000,
+      subtotal: 250000,
+      paymentMethod: 'QRIS',
+      status: 'escrow_pending',
+      trackingNo: '',
+      items: [
+        { productId: 'midnight', name: 'Midnight Crema Blend', qty: 2, weight: '500g', grind: 'Whole Bean', price: 125000 }
+      ]
+    },
+    {
+      id: 'KK-7810B4',
+      date: '2026-10-13',
+      buyerName: 'Dimas Prakoso',
+      buyerCity: 'Surabaya',
+      buyerPhone: '0811-2233-4455',
+      shippingService: 'Next Day',
+      shippingFee: 25000,
+      subtotal: 220000,
+      paymentMethod: 'Credit Card (Visa)',
+      status: 'escrow_shipped',
+      trackingNo: 'JNE-BDG8829104',
+      items: [
+        { productId: 'midnight', name: 'Midnight Crema Blend', qty: 1, weight: '500g', grind: 'Fine / Espresso', price: 125000 },
+        { productId: 'kamojang', name: 'West Java Kamojang', qty: 1, weight: '250g', grind: 'Whole Bean', price: 95000 }
+      ]
+    },
+    {
+      id: 'KK-5120D2',
+      date: '2026-10-10',
+      buyerName: 'Budi Santoso',
+      buyerCity: 'Yogyakarta',
+      buyerPhone: '0818-7766-5544',
+      shippingService: 'Regular (2-3 days)',
+      shippingFee: 15000,
+      subtotal: 285000,
+      paymentMethod: 'Virtual Account (Mandiri)',
+      status: 'released',
+      trackingNo: 'SICEPAT-00192837',
+      items: [
+        { productId: 'kamojang', name: 'West Java Kamojang', qty: 3, weight: '250g', grind: 'Whole Bean', price: 95000 }
+      ]
+    },
+    {
+      id: 'KK-4019E8',
+      date: '2026-10-08',
+      buyerName: 'Siti Aminah',
+      buyerCity: 'Jakarta Pusat',
+      buyerPhone: '0817-3344-5566',
+      shippingService: 'Next Day',
+      shippingFee: 25000,
+      subtotal: 375000,
+      paymentMethod: 'QRIS',
+      status: 'released',
+      trackingNo: 'JNE-BDG7710293',
+      items: [
+        { productId: 'midnight', name: 'Midnight Crema Blend', qty: 3, weight: '500g', grind: 'Fine / Espresso', price: 125000 }
+      ]
+    },
+    {
+      id: 'KK-3190A7',
+      date: '2026-10-05',
+      buyerName: 'Hendra Wijaya',
+      buyerCity: 'Semarang',
+      buyerPhone: '0815-6677-8899',
+      shippingService: 'Regular (2-3 days)',
+      shippingFee: 15000,
+      subtotal: 310000,
+      paymentMethod: 'Virtual Account (BCA)',
+      status: 'released',
+      trackingNo: 'JNT-ID9920182',
+      items: [
+        { productId: 'kamojang', name: 'West Java Kamojang', qty: 2, weight: '250g', grind: 'Medium / V60', price: 95000 },
+        { productId: 'midnight', name: 'Midnight Crema Blend', qty: 1, weight: '500g', grind: 'Whole Bean', price: 120000 }
+      ]
+    }
+  ];
+
+  function readOrders() {
+    try {
+      var raw = localStorage.getItem(ORDERS_KEY);
+      if (raw === null) {
+        localStorage.setItem(ORDERS_KEY, JSON.stringify(SEED_ORDERS));
+        return SEED_ORDERS.slice();
+      }
+      return JSON.parse(raw) || [];
+    } catch (e) { return SEED_ORDERS.slice(); }
+  }
+  function writeOrders(list) {
+    try { localStorage.setItem(ORDERS_KEY, JSON.stringify(list)); } catch (e) {}
+    document.dispatchEvent(new CustomEvent('orders:change'));
+  }
+
+  var orders = {
+    list: readOrders,
+    addFromCheckout: function (checkoutOrder) {
+      var list = readOrders();
+      list.unshift(checkoutOrder);
+      writeOrders(list);
+    },
+    shipOrder: function (orderId, trackingNo) {
+      var list = readOrders().map(function (o) {
+        if (o.id === orderId) {
+          o.status = 'escrow_shipped';
+          o.trackingNo = trackingNo || ('JNE-BDG' + Math.floor(1000000 + Math.random() * 9000000));
+        }
+        return o;
+      });
+      writeOrders(list);
+    },
+    releaseEscrow: function (orderId) {
+      var list = readOrders().map(function (o) {
+        if (o.id === orderId) {
+          o.status = 'released';
+          if (!o.trackingNo) o.trackingNo = 'JNE-BDG' + Math.floor(1000000 + Math.random() * 9000000);
+        }
+        return o;
+      });
+      writeOrders(list);
     }
   };
 
@@ -167,6 +417,8 @@
       name: 'Kala Roastery',
       firstName: 'Arif',
       lastName: 'Santoso',
+      roasteryName: 'Kala Roastery',
+      vendorId: 'kala',
       initials: 'KR',
       email: 'hello@kalaroastery.id',
       role: 'roaster',
@@ -197,7 +449,21 @@
   };
 
   window.BM = {
-    PLATFORM_FEE: PLATFORM_FEE, CART_KEY: CART_KEY, AUTH_KEY: AUTH_KEY, vendors: vendors, products: products, productMap: productMap,
-    fmt: fmt, formatDate: formatDate, daysSince: daysSince, cart: cart, auth: auth, img: img, fallback: FALLBACK_IMG
+    PLATFORM_FEE: PLATFORM_FEE,
+    TODAY_ISO: TODAY_ISO,
+    CART_KEY: CART_KEY,
+    AUTH_KEY: AUTH_KEY,
+    vendors: vendors,
+    products: products,
+    productMap: productMap,
+    catalog: catalog,
+    orders: orders,
+    fmt: fmt,
+    formatDate: formatDate,
+    daysSince: daysSince,
+    cart: cart,
+    auth: auth,
+    img: img,
+    fallback: FALLBACK_IMG
   };
 })();

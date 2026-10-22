@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>KopiKonek — Specialty Coffee &amp; Brewing Gear Marketplace</title>
+  <link rel="icon" type="image/png" href="assets/logo-mark.png" />
   <meta name="description" content="Discover freshly roasted beans and premium brewing gear from independent Indonesian roasteries." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -31,17 +32,16 @@
           <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
 
-        <a href="#top" class="flex items-center gap-2 font-serif text-2xl font-bold tracking-tight">
-          <span class="grid h-8 w-8 place-items-center rounded-full bg-espresso text-cream">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C7 5 4.5 9 6 14c1.200 4 5 7 6 8 1-1 4.800-4 6-8 1.500-5-1-9-6-12Zm-.2 5.200c1.800 2.300 1.800 5.300.4 9.600-.2.600-1 .6-.8-.1 1-3.600 1-6.200.4-9.500Z"/></svg>
-          </span>
-          KopiKonek
+        <a href="#top" class="flex items-center gap-2.5 font-serif text-2xl font-bold tracking-tight group">
+          <img src="assets/logo-mark.png" alt="KopiKonek Logo" class="h-11 w-11 rounded-xl border border-espresso/10 bg-taupe/60 p-1 object-contain shadow-sm transition group-hover:scale-105" />
+          <span>KopiKonek</span>
         </a>
 
         <nav class="hidden items-center gap-8 text-sm font-medium xl:flex" aria-label="Primary">
           <a href="#catalog" data-nav="single" class="nav-link">Coffee Beans</a>
           <a href="#catalog" data-nav="manual" class="nav-link">Brewing Gear</a>
           <a href="#roasteries" class="nav-link">Roasteries</a>
+          <a href="about.html" class="nav-link">About Us</a>
           <a href="#subscription" data-nav="subscription" class="nav-link">Subscription</a>
         </nav>
 
@@ -78,6 +78,7 @@
           <a href="#catalog" data-nav="single" class="rounded-lg px-3 py-3 hover:bg-espresso/5">Coffee Beans</a>
           <a href="#catalog" data-nav="manual" class="rounded-lg px-3 py-3 hover:bg-espresso/5">Brewing Gear</a>
           <a href="#roasteries" class="rounded-lg px-3 py-3 hover:bg-espresso/5">Roasteries</a>
+          <a href="about.html" class="rounded-lg px-3 py-3 hover:bg-espresso/5">About Us</a>
           <a href="#subscription" data-nav="subscription" class="rounded-lg px-3 py-3 hover:bg-espresso/5">Subscription</a>
         </nav>
         <div id="auth-slot-m" class="border-t border-espresso/10 pt-4">
@@ -235,11 +236,9 @@
     <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
       <div class="reveal grid gap-14 lg:grid-cols-12">
         <div class="lg:col-span-4">
-          <a href="#top" class="flex items-center gap-2 font-serif text-2xl font-bold text-cream">
-            <span class="grid h-8 w-8 place-items-center rounded-full bg-cream text-espresso">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C7 5 4.500 9 6 14c1.200 4 5 7 6 8 1-1 4.800-4 6-8 1.500-5-1-9-6-12Z"/></svg>
-            </span>
-            KopiKonek
+          <a href="#top" class="flex items-center gap-2.5 font-serif text-2xl font-bold text-cream">
+            <img src="assets/logo-mark.png" alt="KopiKonek Logo" class="h-10 w-10 rounded-xl bg-cream p-1 object-contain shadow-sm" />
+            <span>KopiKonek</span>
           </a>
           <p class="mt-5 max-w-sm text-sm leading-relaxed text-cream/65">An independent marketplace connecting coffee lovers with Indonesia’s best small-batch roasters and brewing gear makers.</p>
           <form id="newsletter" class="mt-8" novalidate>
@@ -284,7 +283,8 @@
             <h3 class="font-serif text-lg text-cream">Sell on KopiKonek <span class="block font-sans text-xs text-cream/50">(For Roasters)</span></h3>
             <ul class="mt-4 space-y-3 text-sm">
               <li><a class="footer-link" href="login.html">Open your store</a></li>
-              <li><a class="footer-link" href="login.html">Seller dashboard</a></li>
+              <li><a class="footer-link" href="dashboard.html">Seller dashboard</a></li>
+              <li><a class="footer-link" href="about.html">About KopiKonek</a></li>
               <li><a class="footer-link" href="#">Fees &amp; payouts</a></li>
             </ul>
           </div>

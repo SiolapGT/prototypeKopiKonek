@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Secure Checkout — KopiKonek</title>
+  <link rel="icon" type="image/png" href="assets/logo-mark.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -426,6 +427,33 @@
             name: form.first.trim(), method: pay.method, bank: pay.bank, total,
             groups: groups.map((g) => ({ vendor: g.vendor, shipLabel: shipOpt(g).label }))
           });
+          const newOrderId = 'KK-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+          const kalaGroup = groups.find((g) => g.vendor.id === 'kala') || groups[0];
+          if (BM.orders && BM.orders.addFromCheckout && kalaGroup) {
+            const shipChoice = shipOpt(kalaGroup);
+            const methodLabelMap = { va: 'Virtual Account (' + pay.bank + ')', qris: 'QRIS', card: 'Credit Card' };
+            BM.orders.addFromCheckout({
+              id: newOrderId,
+              date: BM.TODAY_ISO,
+              buyerName: (form.first.trim() + ' ' + form.last.trim()).trim(),
+              buyerCity: form.city.trim(),
+              buyerPhone: form.phone.trim(),
+              shippingService: shipChoice.label,
+              shippingFee: shipChoice.price,
+              subtotal: kalaGroup.subtotal,
+              paymentMethod: methodLabelMap[pay.method] || 'Escrow Payment',
+              status: 'escrow_pending',
+              trackingNo: '',
+              items: kalaGroup.items.map((l) => ({
+                productId: l.product.id,
+                name: l.product.name,
+                qty: l.qty,
+                weight: l.product.weight || '250g',
+                grind: l.grind || 'Whole Bean',
+                price: l.product.price
+              }))
+            });
+          }
           BM.cart.clear();
           setStatus('done');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -436,7 +464,10 @@
         <div className="min-h-screen">
           <header className="border-b border-gray-200/80">
             <div className="relative mx-auto flex h-20 max-w-6xl items-center justify-center px-8">
-              <a href="index.html" className="font-serif text-2xl font-bold tracking-tight text-[#2C1E16]">KopiKonek</a>
+              <a href="index.html" className="flex items-center gap-2.5 font-serif text-2xl font-bold tracking-tight text-[#2C1E16]">
+                <img src="assets/logo-mark.png" alt="KopiKonek Logo" className="h-10 w-10 rounded-xl border border-[#2C1E16]/10 bg-[#EDE8E1]/60 p-1 object-contain shadow-sm" />
+                <span>KopiKonek</span>
+              </a>
               <div className="absolute right-8 hidden items-center gap-1.5 text-xs font-medium text-gray-600 sm:flex"><Lock /> Secure Checkout</div>
             </div>
             <div className="flex items-center justify-center gap-1.5 pb-3 text-xs font-medium text-gray-600 sm:hidden"><Lock /> Secure Checkout</div>

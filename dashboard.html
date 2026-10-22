@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seller Dashboard — Kala Roastery | KopiKonek Partner Portal</title>
+  <link rel="icon" type="image/png" href="assets/logo-mark.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: '#F9F8F6',
+            taupe: '#EDE8E1',
+            espresso: '#2C1E16',
+            charcoal: '#4A433E',
+            rust: '#C45E3A',
+            terracotta: '#CC5500',
+            sage: '#7C9082',
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="stylesheet" href="assets/styles.css" />
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-cream text-espresso font-sans antialiased min-h-screen flex flex-col">
+  <div id="root" class="flex-1 flex flex-col"></div>
+
+  <script src="assets/data.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    const PRESET_IMAGES = [
+      { label: 'Classic Kraft Valve Bag', url: BM.img('1559056199-641a0ac8b55e', 900) },
+      { label: 'Artisan Roasted Beans', url: BM.img('1514432324607-a09d9b4aefdd', 900) },
+      { label: 'Single Origin Pour Over', url: BM.img('1509042239860-f550ce710b93', 900) },
+      { label: 'Specialty Whole Beans', url: BM.img('1447933601403-0c6688de566e', 900) },
+    ];
+
+    function PartnerDashboardApp() {
+      const [user, setUser] = useState(() => BM.auth.user());
+      const [orders, setOrders] = useState(() => BM.orders.list());
+      const [kalaBeans, setKalaBeans] = useState(() =>
+        BM.products.filter((p) => p.type === 'bean' && p.vendorId === 'kala')
+      );
+      const [activeSection, setActiveSection] = useState('all'); // 'all' | 'escrow' | 'catalog' | 'revenue'
+      const [orderFilter, setOrderFilter] = useState('all'); // 'all' | 'escrow_pending' | 'escrow_shipped' | 'released'
+      const [trackingInputs, setTrackingInputs] = useState({});
+      const [roastDateInputs, setRoastDateInputs] = useState({});
+      const [priceInputs, setPriceInputs] = useState({});
+      const [showAddModal, setShowAddModal] = useState(false);
+      const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+      const [withdrawnAmount, setWithdrawnAmount] = useState(() => {
+        try { return Number(localStorage.getItem('kopikonek_kala_withdrawn_v1')) || 0; } catch (e) { return 0; }
+      });
+      const [toast, setToast] = useState(null);
+
+      // New Bean Form state
+      const [newBean, setNewBean] = useState({
+        name: '',
+        category: 'single-origin',
+        origin: 'Garut, West Java',
+        altitude: '1,650m',
+        process: 'Honey Process',
+        roast: 'Light',
+        roastDate: BM.TODAY_ISO,
+        price: '108000',
+        weight: '250g',
+        notes: 'White Peach, Brown Sugar, Jasmine',
+        description: 'Small-lot West Java specialty beans roasted in small batches at Kala Roastery Bandung for clarity and sweetness.',
+        acidity: 80,
+        body: 65,
+        sweetness: 88,
+        image: PRESET_IMAGES[0].url,
+      });
+
+      const showToast = (msg) => {
+        setToast(msg);
+        clearTimeout(window.__kkDashToast);
+        window.__kkDashToast = setTimeout(() => setToast(null), 3400);
+      };
+
+      const refreshCatalog = () => {
+        const list = BM.products.filter((p) => p.type === 'bean' && p.vendorId === 'kala');
+        setKalaBeans([...list]);
+      };
+
+      useEffect(() => {
+        const initialDates = {};
+        const initialPrices = {};
+        kalaBeans.forEach((b) => {
+          initialDates[b.id] = b.roastDate;
+          initialPrices[b.id] = b.price;
+        });
+        setRoastDateInputs(initialDates);
+        setPriceInputs(initialPrices);
+      }, [kalaBeans.length]);
+
+      useEffect(() => {
+        const onOrders = () => setOrders([...BM.orders.list()]);
+        const onCatalog = () => refreshCatalog();
+        const onAuth = () => setUser(BM.auth.user());
+        document.addEventListener('orders:change', onOrders);
+        document.addEventListener('catalog:change', onCatalog);
+        document.addEventListener('auth:change', onAuth);
+        return () => {
+          document.removeEventListener('orders:change', onOrders);
+          document.removeEventListener('catalog:change', onCatalog);
+          document.removeEventListener('auth:change', onAuth);
+        };
+      }, []);
+
+      const activatePartnerSession = () => {
+        const u = BM.auth.login(BM.auth.demos.roaster);
+        setUser(u);
+        showToast('Login aktif sebagai Partner: Kala Roastery (Bandung)');
+      };
+
+      // Revenue & Escrow Metrics calculation
+      const stats = useMemo(() => {
+        let escrowPendingTotal = 0;
+        let escrowPendingCount = 0;
+        let escrowShippedTotal = 0;
+        let escrowShippedCount = 0;
+        let releasedTotal = 0;
+        let releasedCount = 0;
+        let totalBagsSold = 0;
+        const productSales = {};
+
+        orders.forEach((o) => {
+          const orderTotal = Number(o.subtotal || 0);
+          if (o.status === 'escrow_pending') {
+            escrowPendingTotal += orderTotal;
+            escrowPendingCount += 1;
+          } else if (o.status === 'escrow_shipped') {
+            escrowShippedTotal += orderTotal;
+            escrowShippedCount += 1;
+          } else if (o.status === 'released') {
+            releasedTotal += orderTotal;
+            releasedCount += 1;
+          }
+          (o.items || []).forEach((it) => {
+            totalBagsSold += Number(it.qty || 1);
+            const key = it.name || it.productId;
+            if (!productSales[key]) {
+              productSales[key] = { name: key, qty: 0, revenue: 0 };
+            }
+            productSales[key].qty += Number(it.qty || 1);
+            productSales[key].revenue += Number(it.price || 0) * Number(it.qty || 1);
+          });
+        });
+
+        const totalEscrowHeld = escrowPendingTotal + escrowShippedTotal;
+        const totalEscrowCount = escrowPendingCount + escrowShippedCount;
+        const grossRevenue = totalEscrowHeld + releasedTotal;
+        const availableBalance = Math.max(0, releasedTotal - withdrawnAmount);
+
+        const avgDaysSinceRoast = kalaBeans.length
+          ? (
+              kalaBeans.reduce((sum, b) => sum + Math.max(0, BM.daysSince(b.roastDate)), 0) /
+              kalaBeans.length
+            ).toFixed(1)
+          : '2.5';
+
+        return {
+          escrowPendingTotal,
+          escrowPendingCount,
+          escrowShippedTotal,
+          escrowShippedCount,
+          totalEscrowHeld,
+          totalEscrowCount,
+          releasedTotal,
+          releasedCount,
+          grossRevenue,
+          availableBalance,
+          totalBagsSold,
+          avgDaysSinceRoast,
+          productBreakdown: Object.values(productSales).sort((a, b) => b.revenue - a.revenue),
+        };
+      }, [orders, kalaBeans, withdrawnAmount]);
+
+      const filteredOrders = useMemo(() => {
+        if (orderFilter === 'all') return orders;
+        return orders.filter((o) => o.status === orderFilter);
+      }, [orders, orderFilter]);
+
+      const handleShipOrder = (orderId) => {
+        const resi = (trackingInputs[orderId] || '').trim() || ('JNE-BDG' + Math.floor(1000000 + Math.random() * 9000000));
+        BM.orders.shipOrder(orderId, resi);
+        setOrders([...BM.orders.list()]);
+        showToast('Pesanan #' + orderId + ' dikirim dengan resi ' + resi + '. Dana tetap aman di Escrow.');
+      };
+
+      const handleReleaseEscrow = (orderId, amount) => {
+        BM.orders.releaseEscrow(orderId);
+        setOrders([...BM.orders.list()]);
+        showToast('Pembeli mengonfirmasi pesanan #' + orderId + '! Dana ' + BM.fmt(amount) + ' cair ke Saldo Toko.');
+      };
+
+      const handleUpdateRoastDate = (beanId, customDate) => {
+        const targetDate = customDate || roastDateInputs[beanId] || BM.TODAY_ISO;
+        const targetPrice = Number(priceInputs[beanId]);
+        const patch = { roastDate: targetDate };
+        if (targetPrice && targetPrice > 0) patch.price = targetPrice;
+        BM.catalog.updateBean(beanId, patch);
+        setRoastDateInputs((prev) => ({ ...prev, [beanId]: targetDate }));
+        refreshCatalog();
+        const bean = BM.productMap[beanId];
+        showToast('Roast Date "' + (bean ? bean.name : beanId) + '" berhasil di-update ke ' + BM.formatDate(targetDate) + '!');
+      };
+
+      const handleSetRoastedToday = (beanId) => {
+        setRoastDateInputs((prev) => ({ ...prev, [beanId]: BM.TODAY_ISO }));
+        handleUpdateRoastDate(beanId, BM.TODAY_ISO);
+      };
+
+      const handleAddBeanSubmit = (e) => {
+        e.preventDefault();
+        if (!newBean.name.trim()) return;
+        const created = BM.catalog.addBean(newBean);
+        refreshCatalog();
+        setRoastDateInputs((prev) => ({ ...prev, [created.id]: created.roastDate }));
+        setPriceInputs((prev) => ({ ...prev, [created.id]: created.price }));
+        setShowAddModal(false);
+        setNewBean({
+          name: '',
+          category: 'single-origin',
+          origin: 'Garut, West Java',
+          altitude: '1,650m',
+          process: 'Honey Process',
+          roast: 'Light',
+          roastDate: BM.TODAY_ISO,
+          price: '108000',
+          weight: '250g',
+          notes: 'White Peach, Brown Sugar, Jasmine',
+          description: 'Small-lot West Java specialty beans roasted in small batches at Kala Roastery Bandung.',
+          acidity: 80,
+          body: 65,
+          sweetness: 88,
+          image: PRESET_IMAGES[0].url,
+        });
+        showToast('Produk baru "' + created.name + '" berhasil ditambahkan ke katalog KopiKonek!');
+      };
+
+      const handleDeleteCustomBean = (beanId, name) => {
+        BM.catalog.deleteBean(beanId);
+        refreshCatalog();
+        showToast('Produk "' + name + '" dihapus dari katalog.');
+      };
+
+      const handleWithdraw = (e) => {
+        e.preventDefault();
+        if (stats.availableBalance <= 0) return;
+        const nextWithdrawn = withdrawnAmount + stats.availableBalance;
+        try { localStorage.setItem('kopikonek_kala_withdrawn_v1', String(nextWithdrawn)); } catch (err) {}
+        setWithdrawnAmount(nextWithdrawn);
+        setShowWithdrawModal(false);
+        showToast('Dana sebesar ' + BM.fmt(stats.availableBalance) + ' berhasil dicairkan ke rekening BCA Kala Roastery!');
+      };
+
+      const isRoasterLoggedIn = user && user.role === 'roaster';
+
+      return (
+        <div className="min-h-screen flex flex-col bg-cream">
+          {/* Top Partner Navbar */}
+          <header className="sticky top-0 z-30 bg-cream/95 backdrop-blur-md border-b border-espresso/10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <a href="index.html" className="flex items-center gap-3 group">
+                  <img
+                    src="assets/logo-mark.png"
+                    alt="KopiKonek Logo"
+                    className="w-11 h-11 rounded-xl object-contain bg-taupe/60 p-1 border border-espresso/10 shadow-sm group-hover:scale-105 transition"
+                  />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-serif text-2xl font-semibold tracking-tight text-espresso">KopiKonek</span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-widest bg-terracotta/15 text-terracotta border border-terracotta/30">
+                        Partner Portal
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-charcoal/70 hidden sm:block">
+                      Roastery Management · Escrow & Fresh Batch Control
+                    </p>
+                  </div>
+                </a>
+              </div>
+
+              <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-charcoal">
+                <a href="index.html" className="hover:text-terracotta transition flex items-center gap-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                  </svg>
+                  Lihat Marketplace
+                </a>
+                <a href="about.html" className="hover:text-terracotta transition">About Us</a>
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-espresso text-cream text-xs font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Seller Dashboard
+                </span>
+              </nav>
+
+              <div className="flex items-center gap-3">
+                {isRoasterLoggedIn ? (
+                  <div className="flex items-center gap-2.5 pl-2 pr-3.5 py-1.5 rounded-full bg-white border border-espresso/15 shadow-sm">
+                    <span className="w-8 h-8 rounded-full bg-terracotta text-cream text-xs font-bold flex items-center justify-center">
+                      KR
+                    </span>
+                    <div className="text-left leading-tight hidden sm:block">
+                      <div className="text-xs font-semibold text-espresso flex items-center gap-1">
+                        Kala Roastery
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-terracotta/15 text-terracotta">
+                          Partner
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-charcoal/70">Bandung, West Java</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        BM.auth.logout();
+                        window.location.href = 'login.html';
+                      }}
+                      title="Ganti Akun / Keluar"
+                      className="ml-1 text-xs text-charcoal/60 hover:text-terracotta transition px-1.5 py-1 rounded"
+                    >
+                      Keluar
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={activatePartnerSession}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-terracotta text-cream text-xs font-semibold hover:bg-espresso transition shadow-sm"
+                  >
+                    Aktifkan Sesi Partner (Kala Roastery)
+                  </button>
+                )}
+              </div>
+            </div>
+          </header>
+
+          {/* Non-roaster notice banner if visitor opened dashboard directly */}
+          {!isRoasterLoggedIn && (
+            <div className="bg-amber-50 border-b border-amber-300/80 px-4 py-3">
+              <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs text-amber-950">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-full bg-amber-200 font-semibold uppercase tracking-wider text-[10px]">
+                    Mode Pratinjau Partner
+                  </span>
+                  <span>
+                    Anda sedang melihat <strong>Partner Dashboard (Kala Roastery)</strong>. Klik tombol di samping agar sesi login Partner aktif di seluruh halaman.
+                  </span>
+                </div>
+                <button
+                  onClick={activatePartnerSession}
+                  className="px-3.5 py-1.5 rounded-full bg-espresso text-cream font-semibold hover:bg-terracotta transition"
+                >
+                  Login Otomatis sebagai Kala Roastery →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Roastery Hero Header */}
+          <section className="bg-gradient-to-br from-[#2C1E16] via-[#3A281E] to-[#241811] text-cream border-b border-espresso/15">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div className="flex items-start sm:items-center gap-4">
+                  <div
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center text-white font-serif text-2xl sm:text-3xl font-bold shadow-lg flex-shrink-0 border border-white/15"
+                    style={{ background: 'linear-gradient(135deg, #CC5500, #7A3A12)' }}
+                  >
+                    KR
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                        ✓ Verified Roastery Partner
+                      </span>
+                      <span className="text-xs text-cream/70">📍 Jl. Braga No. 88, Bandung, West Java</span>
+                    </div>
+                    <h1 className="font-serif text-2xl sm:text-4xl font-semibold mt-1">
+                      Kala Roastery — Seller Dashboard
+                    </h1>
+                    <p className="text-sm text-cream/80 mt-1 max-w-2xl">
+                      Pantau pesanan masuk yang dananya dijamin di <strong>Escrow KopiKonek</strong>, kelola katalog biji kopi spesialti, dan perbarui <strong>Roast Date</strong> batch sangrai terbaru secara real-time.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={() => setShowAddModal(true)}
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-terracotta hover:bg-[#b34a00] text-white text-sm font-semibold transition shadow-lg"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Tambah Produk Biji Kopi
+                  </button>
+                  <a
+                    href="index.html#catalog"
+                    className="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-white/10 hover:bg-white/20 text-cream text-sm font-medium border border-white/15 transition"
+                  >
+                    Lihat Etalase Toko ↗
+                  </a>
+                </div>
+              </div>
+
+              {/* Quick Section Switcher Pills */}
+              <div className="mt-7 pt-6 border-t border-white/10 flex flex-wrap items-center gap-2">
+                {[
+                  { id: 'all', label: 'Semua Fitur Partner' },
+                  { id: 'revenue', label: '1. Ringkasan Pendapatan & Escrow' },
+                  { id: 'escrow', label: '2. Pesanan Masuk (Dana Escrow) (' + stats.totalEscrowCount + ')' },
+                  { id: 'catalog', label: '3. Katalog Kopi & Update Roast Date (' + kalaBeans.length + ')' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveSection(tab.id)}
+                    className={
+                      'px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition ' +
+                      (activeSection === tab.id
+                        ? 'bg-cream text-espresso font-semibold shadow-sm'
+                        : 'bg-white/10 text-cream/80 hover:bg-white/20')
+                    }
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Main Dashboard Content */}
+          <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-10 flex-1">
+            {/* =====================================================================
+                SECTION 1: RINGKASAN PENDAPATAN PENJUALAN TOKO & ESCROW
+            ===================================================================== */}
+            {(activeSection === 'all' || activeSection === 'revenue') && (
+              <section aria-labelledby="revenue-heading" className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-widest text-terracotta">
+                      Store Financial Overview
+                    </span>
+                    <h2 id="revenue-heading" className="font-serif text-2xl sm:text-3xl font-semibold text-espresso mt-0.5">
+                      Ringkasan Pendapatan Penjualan Toko
+                    </h2>
+                  </div>
+                  <div className="text-xs text-charcoal/75 bg-taupe/60 px-3.5 py-2 rounded-full border border-espresso/10">
+                    Periode: <strong>Oktober 2026</strong> · Rekening Terhubung: <strong>BCA 014-8892-104 a.n. Kala Roastery</strong>
+                  </div>
+                </div>
+
+                {/* 4 Financial Metric Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                  {/* Card 1: Dana Ditahan di Escrow */}
+                  <div className="bg-white rounded-2xl p-6 border-2 border-terracotta/30 shadow-sm relative overflow-hidden">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-900">
+                        🔒 Dana di Escrow
+                      </span>
+                      <span className="text-xs font-semibold text-terracotta">
+                        {stats.totalEscrowCount} Pesanan Aktif
+                      </span>
+                    </div>
+                    <div className="font-serif text-2xl sm:text-3xl font-bold text-espresso mt-4">
+                      {BM.fmt(stats.totalEscrowHeld)}
+                    </div>
+                    <p className="text-xs text-charcoal/75 mt-2 leading-relaxed">
+                      <strong>{BM.fmt(stats.escrowPendingTotal)}</strong> menunggu dikirim ({stats.escrowPendingCount}) ·{' '}
+                      <strong>{BM.fmt(stats.escrowShippedTotal)}</strong> sedang dikirim ({stats.escrowShippedCount})
+                    </p>
+                    <div className="mt-4 pt-3 border-t border-espresso/10 text-[11px] text-charcoal/70 flex items-center justify-between">
+                      <span>Dijamin KopiKonek Escrow</span>
+                      <span className="text-terracotta font-semibold">Aman 100%</span>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Saldo Siap Cair (Available Balance) */}
+                  <div className="bg-white rounded-2xl p-6 border border-espresso/10 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-900">
+                          ✓ Saldo Siap Cair
+                        </span>
+                        <span className="text-xs text-emerald-700 font-medium">
+                          {stats.releasedCount} Pesanan Selesai
+                        </span>
+                      </div>
+                      <div className="font-serif text-2xl sm:text-3xl font-bold text-espresso mt-4">
+                        {BM.fmt(stats.availableBalance)}
+                      </div>
+                      <p className="text-xs text-charcoal/75 mt-2">
+                        Total dana lepas dari Escrow: <strong>{BM.fmt(stats.releasedTotal)}</strong>
+                        {withdrawnAmount > 0 && ` (Sudah ditarik: ${BM.fmt(withdrawnAmount)})`}
+                      </p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-espresso/10">
+                      <button
+                        onClick={() => setShowWithdrawModal(true)}
+                        disabled={stats.availableBalance <= 0}
+                        className="w-full py-2 px-3 rounded-xl bg-espresso text-cream text-xs font-semibold hover:bg-terracotta transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        {stats.availableBalance > 0 ? 'Tarik Saldo ke Rekening BCA →' : 'Saldo Telah Dicairkan'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Total Pendapatan Kotor Toko */}
+                  <div className="bg-white rounded-2xl p-6 border border-espresso/10 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-charcoal/70">
+                          Total Pendapatan Toko
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-sage/20 text-espresso">
+                          +24.8% bln ini
+                        </span>
+                      </div>
+                      <div className="font-serif text-2xl sm:text-3xl font-bold text-espresso mt-4">
+                        {BM.fmt(stats.grossRevenue)}
+                      </div>
+                      <p className="text-xs text-charcoal/75 mt-2">
+                        Akumulasi dari <strong>{orders.length} transaksi</strong> ({stats.totalBagsSold} pouch biji kopi terjual bulan ini).
+                      </p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-espresso/10 text-[11px] text-charcoal/70 flex items-center justify-between">
+                      <span>Rata-rata nilai order</span>
+                      <span className="font-semibold text-espresso">
+                        {BM.fmt(orders.length ? Math.round(stats.grossRevenue / orders.length) : 0)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Card 4: Indeks Kesegaran Sangrai (Freshness Score) */}
+                  <div className="bg-white rounded-2xl p-6 border border-espresso/10 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-charcoal/70">
+                          Fresh Roast Score
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-terracotta/15 text-terracotta">
+                          ★ 4.95 / 5.0
+                        </span>
+                      </div>
+                      <div className="font-serif text-2xl sm:text-3xl font-bold text-espresso mt-4">
+                        {stats.avgDaysSinceRoast} Hari
+                      </div>
+                      <p className="text-xs text-charcoal/75 mt-2">
+                        Rata-rata usia sangrai dari <strong>{kalaBeans.length} varian kopi aktif</strong> di etalase Kala Roastery.
+                      </p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-espresso/10 text-[11px] text-emerald-800 font-medium flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                      Semua batch dalam Peak Flavor Window
+                    </div>
+                  </div>
+                </div>
+
+                {/* Product Revenue Breakdown Card */}
+                <div className="bg-white rounded-2xl p-6 border border-espresso/10 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
+                    <div>
+                      <h3 className="font-serif text-lg font-semibold text-espresso">
+                        Kontribusi Pendapatan per Produk Biji Kopi
+                      </h3>
+                      <p className="text-xs text-charcoal/70">
+                        Performa penjualan biji kopi Kala Roastery berdasarkan pesanan masuk & selesai.
+                      </p>
+                    </div>
+                    <span className="text-xs font-medium text-charcoal/70">
+                      Total: <strong className="text-espresso">{stats.totalBagsSold} Pouch Terjual</strong>
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {stats.productBreakdown.map((item) => {
+                      const pct = stats.grossRevenue > 0 ? Math.round((item.revenue / stats.grossRevenue) * 100) : 0;
+                      return (
+                        <div key={item.name} className="p-4 rounded-xl bg-cream/70 border border-espresso/10">
+                          <div className="flex items-center justify-between text-sm font-semibold text-espresso">
+                            <span>{item.name}</span>
+                            <span>{BM.fmt(item.revenue)}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs text-charcoal/70 mt-1">
+                            <span>{item.qty} pouch terjual</span>
+                            <span>{pct}% dari pendapatan toko</span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-taupe mt-3 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-terracotta transition-all duration-500"
+                              style={{ width: `${Math.max(10, pct)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* =====================================================================
+                SECTION 2: PESANAN MASUK YANG DANANYA DITAHAN DI ESCROW
+            ===================================================================== */}
+            {(activeSection === 'all' || activeSection === 'escrow') && (
+              <section aria-labelledby="escrow-heading" className="space-y-6">
+                <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-widest text-terracotta">
+                      Escrow Order Protection
+                    </span>
+                    <h2 id="escrow-heading" className="font-serif text-2xl sm:text-3xl font-semibold text-espresso mt-0.5">
+                      Pesanan Masuk & Status Dana Escrow
+                    </h2>
+                    <p className="text-sm text-charcoal/80 mt-1">
+                      Dana pembayaran pembeli ditahan sementara di <strong>Rekening Bersama (Escrow) KopiKonek</strong> dan otomatis cair ke saldo Kala Roastery saat pesanan diterima pembeli.
+                    </p>
+                  </div>
+
+                  {/* Filter Tabs */}
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { id: 'all', label: `Semua (${orders.length})` },
+                      { id: 'escrow_pending', label: `🔒 Perlu Dikirim · Escrow (${stats.escrowPendingCount})` },
+                      { id: 'escrow_shipped', label: `🚚 Dalam Pengiriman · Escrow (${stats.escrowShippedCount})` },
+                      { id: 'released', label: `✓ Dana Cair (${stats.releasedCount})` },
+                    ].map((f) => (
+                      <button
+                        key={f.id}
+                        onClick={() => setOrderFilter(f.id)}
+                        className={
+                          'px-3.5 py-2 rounded-full text-xs font-semibold transition border ' +
+                          (orderFilter === f.id
+                            ? 'bg-espresso text-cream border-espresso'
+                            : 'bg-white text-charcoal border-espresso/15 hover:border-espresso/40')
+                        }
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Escrow Flow Banner */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-taupe/55 rounded-2xl p-4 sm:p-5 border border-espresso/10">
+                  <div className="flex items-start gap-3">
+                    <span className="w-7 h-7 rounded-full bg-terracotta text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                      1
+                    </span>
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-wider text-espresso">
+                        Pembeli Membayar ke Escrow
+                      </div>
+                      <p className="text-xs text-charcoal/80 mt-0.5">
+                        Dana diverifikasi & dikunci aman oleh KopiKonek. Roastery mendapat notifikasi pesanan beserta pilihan <em>Grind Size</em>.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="w-7 h-7 rounded-full bg-espresso text-cream text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                      2
+                    </span>
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-wider text-espresso">
+                        Roastery Menggiling & Mengirim Kopi
+                      </div>
+                      <p className="text-xs text-charcoal/80 mt-0.5">
+                        Kala Roastery mengirim paket sesuai kurir pilihan pembeli dan memasukkan nomor resi pengiriman.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="w-7 h-7 rounded-full bg-emerald-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                      3
+                    </span>
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-wider text-espresso">
+                        Pesanan Diterima → Dana Cair 100%
+                      </div>
+                      <p className="text-xs text-charcoal/80 mt-0.5">
+                        Setelah barang diterima, dana otomatis berpindah dari <strong>Escrow</strong> ke <strong>Saldo Siap Cair</strong> toko.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Orders List */}
+                <div className="space-y-4">
+                  {filteredOrders.map((order) => {
+                    const isPending = order.status === 'escrow_pending';
+                    const isShipped = order.status === 'escrow_shipped';
+                    const isReleased = order.status === 'released';
+
+                    return (
+                      <div
+                        key={order.id}
+                        className={
+                          'bg-white rounded-2xl p-5 sm:p-6 border transition shadow-sm ' +
+                          (isPending
+                            ? 'border-l-4 border-l-terracotta border-espresso/15'
+                            : isShipped
+                            ? 'border-l-4 border-l-amber-600 border-espresso/15'
+                            : 'border-espresso/10')
+                        }
+                      >
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-espresso/10">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span className="font-mono text-sm font-bold text-espresso bg-cream px-3 py-1 rounded-lg border border-espresso/15">
+                              #{order.id}
+                            </span>
+                            <span className="text-xs text-charcoal/70">
+                              Tanggal Order: <strong className="text-espresso">{BM.formatDate(order.date)}</strong>
+                            </span>
+                            <span className="text-xs text-charcoal/70">•</span>
+                            <span className="text-xs text-charcoal/80">
+                              Pembeli: <strong className="text-espresso">{order.buyerName}</strong> ({order.buyerCity})
+                            </span>
+                            <span className="text-xs text-charcoal/70">•</span>
+                            <span className="text-xs text-charcoal/80">
+                              Kurir: <strong className="text-espresso">{order.shippingService}</strong>
+                            </span>
+                          </div>
+
+                          {/* Escrow Status Badge */}
+                          <div>
+                            {isPending && (
+                              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-950 border border-amber-300">
+                                🔒 Dana Ditahan di Escrow · Perlu Dikirim
+                              </span>
+                            )}
+                            {isShipped && (
+                              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-900 border border-blue-200">
+                                🚚 Dalam Pengiriman (Resi: {order.trackingNo}) · Dana di Escrow
+                              </span>
+                            )}
+                            {isReleased && (
+                              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-900 border border-emerald-300">
+                                ✓ Selesai · Dana Escrow Telah Cair ke Saldo Toko
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Order Items & Action Row */}
+                        <div className="pt-4 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                          <div className="space-y-2.5 flex-1">
+                            {(order.items || []).map((it, idx) => (
+                              <div key={idx} className="flex flex-wrap items-center justify-between gap-2 bg-cream/60 px-3.5 py-2.5 rounded-xl border border-espresso/10">
+                                <div className="flex items-center gap-3">
+                                  <span className="w-7 h-7 rounded-lg bg-terracotta/15 text-terracotta font-bold text-xs flex items-center justify-center">
+                                    {it.qty}×
+                                  </span>
+                                  <div>
+                                    <div className="text-sm font-semibold text-espresso">{it.name}</div>
+                                    <div className="text-xs text-charcoal/75 flex flex-wrap items-center gap-2 mt-0.5">
+                                      <span className="px-2 py-0.5 rounded bg-white border border-espresso/10 text-[11px] font-medium">
+                                        Grind: <strong>{it.grind || 'Whole Bean'}</strong>
+                                      </span>
+                                      <span> Kemasan: {it.weight || '250g'}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="text-sm font-semibold text-espresso">
+                                  {BM.fmt((it.price || 0) * (it.qty || 1))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Right Side Escrow Value & Action Buttons */}
+                          <div className="lg:w-80 flex flex-col justify-between bg-taupe/35 p-4 rounded-xl border border-espresso/10">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-charcoal/75">
+                                {isReleased ? 'Dana Diterima Toko:' : 'Nilai Dana di Escrow:'}
+                              </span>
+                              <span className="font-serif text-xl font-bold text-espresso">
+                                {BM.fmt(order.subtotal)}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-charcoal/65 mt-0.5">
+                              Metode Bayar: {order.paymentMethod} (+ Ongkir {BM.fmt(order.shippingFee)})
+                            </div>
+
+                            {isPending && (
+                              <div className="mt-3 pt-3 border-t border-espresso/10 space-y-2">
+                                <input
+                                  type="text"
+                                  placeholder="Nomor Resi (opsional, otomatis jika kosong)"
+                                  value={trackingInputs[order.id] || ''}
+                                  onChange={(e) =>
+                                    setTrackingInputs((prev) => ({ ...prev, [order.id]: e.target.value }))
+                                  }
+                                  className="w-full px-3 py-1.5 rounded-lg bg-white border border-espresso/20 text-xs focus:outline-none focus:border-terracotta"
+                                />
+                                <button
+                                  onClick={() => handleShipOrder(order.id)}
+                                  className="w-full py-2 px-3 rounded-lg bg-terracotta hover:bg-espresso text-white text-xs font-semibold transition"
+                                >
+                                  Kirim Pesanan & Input Resi
+                                </button>
+                              </div>
+                            )}
+
+                            {isShipped && (
+                              <div className="mt-3 pt-3 border-t border-espresso/10 space-y-2">
+                                <div className="text-[11px] text-charcoal/75">
+                                  Menunggu konfirmasi penerimaan dari <strong>{order.buyerName}</strong>.
+                                </div>
+                                <button
+                                  onClick={() => handleReleaseEscrow(order.id, order.subtotal)}
+                                  className="w-full py-2 px-3 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold transition"
+                                >
+                                  Simulasikan Pembeli Terima Barang (Cairkan Escrow)
+                                </button>
+                              </div>
+                            )}
+
+                            {isReleased && (
+                              <div className="mt-3 pt-2 border-t border-espresso/10 text-[11px] text-emerald-800 font-medium flex items-center justify-between">
+                                <span>Resi: {order.trackingNo}</span>
+                                <span>✓ Masuk Saldo Toko</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* =====================================================================
+                SECTION 3: KELOLA PRODUK BIJI KOPI & UPDATE ROAST DATE BATCH TERBARU
+            ===================================================================== */}
+            {(activeSection === 'all' || activeSection === 'catalog') && (
+              <section aria-labelledby="catalog-heading" className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-widest text-terracotta">
+                      Roastery Inventory & Freshness Control
+                    </span>
+                    <h2 id="catalog-heading" className="font-serif text-2xl sm:text-3xl font-semibold text-espresso mt-0.5">
+                      Katalog Biji Kopi & Update Roast Date Batch Terbaru
+                    </h2>
+                    <p className="text-sm text-charcoal/80 mt-1">
+                      Perbarui <strong>Roast Date</strong> setiap kali Kala Roastery selesai menyangrai batch baru, atau tambahkan varian biji kopi baru. Perubahan langsung tampil di halaman utama KopiKonek!
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => setShowAddModal(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-espresso hover:bg-terracotta text-cream text-xs sm:text-sm font-semibold transition self-start sm:self-auto"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Tambah Produk Biji Kopi Baru
+                  </button>
+                </div>
+
+                {/* Bean Cards Grid for Kala Roastery */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {kalaBeans.map((bean) => {
+                    const days = BM.daysSince(bean.roastDate);
+                    const freshnessText =
+                      days <= 0
+                        ? 'Baru disangrai hari ini! · Siap degassing'
+                        : days <= 5
+                        ? `${days} hari lalu · Resting / Peak Aroma`
+                        : `${days} hari lalu · Siap Seduh`;
+
+                    return (
+                      <div
+                        key={bean.id}
+                        className="bg-white rounded-2xl border border-espresso/15 shadow-sm overflow-hidden flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex flex-col sm:flex-row gap-4 p-5 border-b border-espresso/10">
+                            <img
+                              src={bean.image}
+                              alt={bean.name}
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = BM.fallback;
+                              }}
+                              className="w-full sm:w-32 h-36 sm:h-32 rounded-xl object-cover flex-shrink-0 border border-espresso/10"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2">
+                                <div>
+                                  <span className="text-[11px] font-semibold uppercase tracking-wider text-terracotta">
+                                    {bean.category === 'espresso' ? 'Espresso Blend' : 'Single Origin'} · {bean.roast} Roast
+                                  </span>
+                                  <h3 className="font-serif text-xl font-semibold text-espresso mt-0.5">
+                                    {bean.name}
+                                  </h3>
+                                </div>
+                                {bean.isCustom && (
+                                  <button
+                                    onClick={() => handleDeleteCustomBean(bean.id, bean.name)}
+                                    className="text-xs text-red-700 hover:underline"
+                                    title="Hapus produk ini"
+                                  >
+                                    Hapus
+                                  </button>
+                                )}
+                              </div>
+
+                              <p className="text-xs text-charcoal/75 mt-1">
+                                Origin: <strong>{bean.origin}</strong> ({bean.altitude}) · {bean.process}
+                              </p>
+
+                              {/* Flavor Notes */}
+                              <div className="flex flex-wrap gap-1.5 mt-2.5">
+                                {(bean.notes || []).map((n) => (
+                                  <span
+                                    key={n}
+                                    className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-taupe/70 text-espresso"
+                                  >
+                                    {n}
+                                  </span>
+                                ))}
+                              </div>
+
+                              {/* Current Live Roast Date Indicator */}
+                              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-300/80 text-emerald-950 text-xs font-medium">
+                                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                                <span>
+                                  Batch Aktif: <strong>{BM.formatDate(bean.roastDate)}</strong> ({freshnessText})
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Roast Date & Price Batch Updater Controls */}
+                          <div className="p-5 bg-cream/60 space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-[11px] font-semibold uppercase tracking-wider text-charcoal/80 mb-1">
+                                  Tanggal Sangrai (Roast Date Batch Baru)
+                                </label>
+                                <input
+                                  type="date"
+                                  value={roastDateInputs[bean.id] || bean.roastDate}
+                                  max={BM.TODAY_ISO}
+                                  onChange={(e) =>
+                                    setRoastDateInputs((prev) => ({ ...prev, [bean.id]: e.target.value }))
+                                  }
+                                  className="w-full px-3 py-2 rounded-xl bg-white border border-espresso/20 text-xs font-medium text-espresso focus:outline-none focus:border-terracotta"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-[11px] font-semibold uppercase tracking-wider text-charcoal/80 mb-1">
+                                  Harga per {bean.weight} (Rp)
+                                </label>
+                                <input
+                                  type="number"
+                                  step="1000"
+                                  value={priceInputs[bean.id] !== undefined ? priceInputs[bean.id] : bean.price}
+                                  onChange={(e) =>
+                                    setPriceInputs((prev) => ({ ...prev, [bean.id]: e.target.value }))
+                                  }
+                                  className="w-full px-3 py-2 rounded-xl bg-white border border-espresso/20 text-xs font-medium text-espresso focus:outline-none focus:border-terracotta"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => handleSetRoastedToday(bean.id)}
+                                className="px-3.5 py-2 rounded-xl bg-taupe hover:bg-espresso/15 text-espresso text-xs font-semibold transition"
+                              >
+                                🔥 Set Sangrai Hari Ini ({BM.formatDate(BM.TODAY_ISO)})
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateRoastDate(bean.id)}
+                                className="px-4 py-2 rounded-xl bg-terracotta hover:bg-espresso text-white text-xs font-semibold transition shadow-sm"
+                              >
+                                Simpan Update Batch
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+          </main>
+
+          {/* =====================================================================
+              MODAL: TAMBAH PRODUK BIJI KOPI BARU (KALA ROASTERY)
+          ===================================================================== */}
+          {showAddModal && (
+            <div className="fixed inset-0 z-50 bg-espresso/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+              <div className="bg-cream rounded-3xl max-w-2xl w-full p-6 sm:p-8 border border-espresso/15 shadow-2xl my-8 max-h-[92vh] overflow-y-auto">
+                <div className="flex items-start justify-between gap-4 pb-4 border-b border-espresso/10">
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-widest text-terracotta">
+                      Kala Roastery · New Release
+                    </span>
+                    <h3 className="font-serif text-2xl font-semibold text-espresso mt-0.5">
+                      Tambah Produk Biji Kopi Baru
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => setShowAddModal(false)}
+                    className="w-9 h-9 rounded-full bg-taupe/70 hover:bg-espresso hover:text-cream flex items-center justify-center text-sm font-bold transition"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <form onSubmit={handleAddBeanSubmit} className="space-y-4 mt-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-espresso mb-1">
+                        Nama Produk Biji Kopi *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Contoh: Garut Papandayan Honey"
+                        value={newBean.name}
+                        onChange={(e) => setNewBean({ ...newBean, name: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-espresso/20 text-sm focus:outline-none focus:border-terracotta"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-espresso mb-1">
+                        Kategori Katalog
+                      </label>
+                      <select
+                        value={newBean.category}
+                        onChange={(e) => setNewBean({ ...newBean, category: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-espresso/20 text-sm focus:outline-none focus:border-terracotta"
+                      >
+                        <option value="single-origin">Single Origin Beans</option>
+                        <option value="espresso">Espresso Blends</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-espresso mb-1">
+                        Origin / Daerah Asal
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newBean.origin}
+                        onChange={(e) => setNewBean({ ...newBean, origin: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-espresso/20 text-sm focus:outline-none focus:border-terracotta"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-espresso mb-1">
+                        Proses Pasca-Panen
+                      </label>
+                      <input
+                        type="text"
+                        value={newBean.process}
+                        onChange={(e) => setNewBean({ ...newBean, process: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-espresso/20 text-sm focus:outline-none focus:border-terracotta"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-espresso mb-1">
+                        Ketinggian (Altitude)
+                      </label>
+                      <input
+                        type="text"
+                        value={newBean.altitude}
+                        onChange={(e) => setNewBean({ ...newBean, altitude: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-espresso/20 text-sm focus:outline-none focus:border-terracotta"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-espresso mb-1">
+                        Profil Sangrai (Roast)
+                      </label>
+                      <select
+                        value={newBean.roast}
+                        onChange={(e) => setNewBean({ ...newBean, roast: e.target.value })}
+                        className="w-full px-3 py-2.5 rounded-xl bg-white border border-espresso/20 text-sm focus:outline-none focus:border-terracotta"
+                      >
+                        <option value="Light">Light Roast</option>
+                        <option value="Medium">Medium Roast</option>
+                        <option value="Medium-Dark">Medium-Dark</option>
+                        <option value="Dark">Dark Roast</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-espresso mb-1">
+                        Roast Date Batch *
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        value={newBean.roastDate}
+                        onChange={(e) => setNewBean({ ...newBean, roastDate: e.target.value })}
+                        className="w-full px-3 py-2.5 rounded-xl bg-white border border-espresso/20 text-sm focus:outline-none focus:border-terracotta"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-espresso mb-1">
+                        Harga (Rp) *
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        step="1000"
+                        value={newBean.price}
+                        onChange={(e) => setNewBean({ ...newBean, price: e.target.value })}
+                        className="w-full px-3 py-2.5 rounded-xl bg-white border border-espresso/20 text-sm focus:outline-none focus:border-terracotta"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-espresso mb-1">
+                        Berat Kemasan
+                      </label>
+                      <select
+                        value={newBean.weight}
+                        onChange={(e) => setNewBean({ ...newBean, weight: e.target.value })}
+                        className="w-full px-3 py-2.5 rounded-xl bg-white border border-espresso/20 text-sm focus:outline-none focus:border-terracotta"
+                      >
+                        <option value="200g">200g</option>
+                        <option value="250g">250g</option>
+                        <option value="500g">500g</option>
+                        <option value="1kg">1kg</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-espresso mb-1">
+                      Tasting / Flavor Notes (pisahkan dengan koma)
+                    </label>
+                    <input
+                      type="text"
+                      value={newBean.notes}
+                      onChange={(e) => setNewBean({ ...newBean, notes: e.target.value })}
+                      placeholder="Contoh: White Peach, Brown Sugar, Jasmine"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-espresso/20 text-sm focus:outline-none focus:border-terracotta"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-espresso mb-2">
+                      Pilih Foto Kemasan / Biji Kopi
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {PRESET_IMAGES.map((imgOpt) => (
+                        <button
+                          type="button"
+                          key={imgOpt.url}
+                          onClick={() => setNewBean({ ...newBean, image: imgOpt.url })}
+                          className={
+                            'p-1.5 rounded-xl border text-left transition ' +
+                            (newBean.image === imgOpt.url
+                              ? 'border-2 border-terracotta bg-terracotta/10'
+                              : 'border-espresso/15 bg-white hover:border-espresso/40')
+                          }
+                        >
+                          <img src={imgOpt.url} alt={imgOpt.label} className="w-full h-16 object-cover rounded-lg" />
+                          <div className="text-[10px] font-medium text-espresso mt-1 truncate">{imgOpt.label}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-3 pt-4 border-t border-espresso/10">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddModal(false)}
+                      className="px-4 py-2.5 rounded-full bg-taupe text-espresso text-xs font-semibold hover:bg-espresso/15 transition"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 rounded-full bg-terracotta hover:bg-espresso text-white text-xs sm:text-sm font-semibold transition shadow-md"
+                    >
+                      Terbitkan Produk ke Katalog KopiKonek
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* =====================================================================
+              MODAL: TARIK SALDO TOKO KE REKENING BCA
+          ===================================================================== */}
+          {showWithdrawModal && (
+            <div className="fixed inset-0 z-50 bg-espresso/60 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-cream rounded-3xl max-w-md w-full p-6 sm:p-8 border border-espresso/15 shadow-2xl">
+                <span className="text-xs font-semibold uppercase tracking-widest text-emerald-700">
+                  Escrow Payout · Kala Roastery
+                </span>
+                <h3 className="font-serif text-2xl font-semibold text-espresso mt-1">
+                  Cairkan Saldo Penjualan
+                </h3>
+                <p className="text-xs text-charcoal/80 mt-2">
+                  Dana dari pesanan yang telah selesai akan ditransfer secara instan ke rekening bank terdaftar.
+                </p>
+
+                <div className="mt-5 p-4 rounded-2xl bg-white border border-espresso/10 space-y-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-charcoal/70">Bank Tujuan</span>
+                    <strong className="text-espresso">BCA · 014-8892-104 (Kala Roastery)</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-charcoal/70">Biaya Pencairan Partner</span>
+                    <strong className="text-emerald-700">Gratis (Rp 0)</strong>
+                  </div>
+                  <div className="pt-2 border-t border-espresso/10 flex justify-between text-sm">
+                    <span className="font-semibold text-espresso">Total Dana Ditransfer</span>
+                    <strong className="font-serif text-lg text-terracotta">{BM.fmt(stats.availableBalance)}</strong>
+                  </div>
+                </div>
+
+                <form onSubmit={handleWithdraw} className="mt-6 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowWithdrawModal(false)}
+                    className="px-4 py-2.5 rounded-full bg-taupe text-espresso text-xs font-semibold"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow-md transition"
+                  >
+                    Konfirmasi Pencairan Sekarang
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Toast Notification */}
+          {toast && (
+            <div className="fixed bottom-6 right-6 z-50 max-w-md bg-espresso text-cream px-5 py-3.5 rounded-2xl shadow-2xl border border-white/15 flex items-center gap-3 text-xs sm:text-sm font-medium">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 flex-shrink-0"></span>
+              <span>{toast}</span>
+            </div>
+          )}
+
+          {/* Footer */}
+          <footer className="bg-espresso text-cream/80 py-8 px-4 sm:px-6 lg:px-8 mt-12">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+              <div className="flex items-center gap-3">
+                <img src="assets/logo-mark.png" alt="KopiKonek" className="w-7 h-7 rounded-lg bg-cream p-0.5 object-contain" />
+                <span>
+                  <strong className="text-cream">KopiKonek Partner Portal</strong> · Kala Roastery (Bandung, West Java)
+                </span>
+              </div>
+              <div className="flex items-center gap-5">
+                <a href="index.html" className="hover:text-white transition">Marketplace</a>
+                <a href="about.html" className="hover:text-white transition">About Us</a>
+                <a href="login.html" className="hover:text-white transition">Switch Account</a>
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<PartnerDashboardApp />);
+  </script>
+</body>
+</html>
