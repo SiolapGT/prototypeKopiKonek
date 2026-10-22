@@ -212,7 +212,9 @@
         localStorage.setItem(CART_KEY, JSON.stringify(seed));
         return seed;
       }
-      return JSON.parse(raw) || [];
+      var parsed = JSON.parse(raw) || [];
+      parsed.forEach(function (o) { if (o.buyerName === 'Rani Wijaya') o.buyerName = 'Karina'; });
+      return parsed;
     } catch (e) { return []; }
   }
   function writeCart(items) {
@@ -258,7 +260,7 @@
     {
       id: 'KK-9482A1',
       date: '2026-10-14',
-      buyerName: 'Rani Wijaya',
+      buyerName: 'Karina',
       buyerCity: 'Jakarta Selatan',
       buyerPhone: '0812-3456-7890',
       shippingService: 'Regular (2-3 days)',
@@ -362,7 +364,9 @@
         localStorage.setItem(ORDERS_KEY, JSON.stringify(SEED_ORDERS));
         return SEED_ORDERS.slice();
       }
-      return JSON.parse(raw) || [];
+      var parsed = JSON.parse(raw) || [];
+      parsed.forEach(function (o) { if (o.buyerName === 'Rani Wijaya') o.buyerName = 'Karina'; });
+      return parsed;
     } catch (e) { return SEED_ORDERS.slice(); }
   }
   function writeOrders(list) {
@@ -402,11 +406,11 @@
   /* ---------- Auth store (localStorage) ---------- */
   var DEMO_USERS = {
     buyer: {
-      name: 'Rani Wijaya',
-      firstName: 'Rani',
-      lastName: 'Wijaya',
-      initials: 'RW',
-      email: 'rani.wijaya@kopikonek.id',
+      name: 'Karina',
+      firstName: 'Karina',
+      lastName: '',
+      initials: 'KA',
+      email: 'karina@kopikonek.id',
       role: 'buyer',
       phone: '081234567890',
       address: 'Jl. Senopati No. 42, Kebayoran Baru',
@@ -433,7 +437,17 @@
     user: function () {
       try {
         var raw = localStorage.getItem(AUTH_KEY);
-        return raw ? JSON.parse(raw) : null;
+        if (!raw) return null;
+        var u = JSON.parse(raw);
+        if (u && (u.name === 'Rani Wijaya' || u.firstName === 'Rani')) {
+          u.name = 'Karina';
+          u.firstName = 'Karina';
+          u.lastName = '';
+          u.initials = 'KA';
+          if (u.email === 'rani.wijaya@kopikonek.id') u.email = 'karina@kopikonek.id';
+          localStorage.setItem(AUTH_KEY, JSON.stringify(u));
+        }
+        return u;
       } catch (e) { return null; }
     },
     login: function (u) {

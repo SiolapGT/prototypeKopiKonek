@@ -191,7 +191,7 @@
           finishLogin(BM.auth.demos.roaster);
           return;
         }
-        if (emailLower === BM.auth.demos.buyer.email) {
+        if (((emailLower === BM.auth.demos.buyer.email || emailLower === 'rani.wijaya@kopikonek.id') || emailLower === 'rani.wijaya@kopikonek.id')) {
           finishLogin(BM.auth.demos.buyer);
           return;
         }
@@ -442,7 +442,7 @@
                             className="inline-flex items-center gap-1.5 rounded-full border border-espresso/15 bg-white px-3 py-1.5 text-xs font-semibold text-espresso shadow-sm transition hover:border-terracotta hover:text-terracotta active:scale-95"
                           >
                             <span className="h-2 w-2 rounded-full bg-sage"></span>
-                            Rani (Buyer)
+                            Karina (Buyer)
                           </button>
                           <button
                             type="button"
@@ -473,7 +473,7 @@
                           id="si-email"
                           type="email"
                           autoComplete="email"
-                          placeholder="rani.wijaya@kopikonek.id"
+                          placeholder="karina@kopikonek.id"
                           value={signInForm.email}
                           onChange={(e) => setSignInForm({ ...signInForm, email: e.target.value })}
                           className={inputClass(shownSignInErr.email)}
@@ -587,7 +587,7 @@
                           <input
                             id="su-first"
                             type="text"
-                            placeholder="Rani"
+                            placeholder="Karina"
                             value={signUpForm.firstName}
                             onChange={(e) => setSignUpForm({ ...signUpForm, firstName: e.target.value })}
                             className={inputClass(shownSignUpErr.firstName)}

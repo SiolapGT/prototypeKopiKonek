@@ -113,7 +113,7 @@
         <section aria-labelledby="sec-ship">
           <SectionTitle><span id="sec-ship">1. Shipping Address</span></SectionTitle>
           <div className="grid gap-5 sm:grid-cols-2">
-            <TextInput id="first" label="First name" value={form.first} onChange={(v) => setField('first', v)} error={errors.first} autoComplete="given-name" placeholder="Rani" />
+            <TextInput id="first" label="First name" value={form.first} onChange={(v) => setField('first', v)} error={errors.first} autoComplete="given-name" placeholder="Karina" />
             <TextInput id="last" label="Last name" value={form.last} onChange={(v) => setField('last', v)} error={errors.last} autoComplete="family-name" placeholder="Wijaya" />
             <TextInput id="phone" label="Phone number" type="tel" className="sm:col-span-2" value={form.phone} onChange={(v) => setField('phone', v)} error={errors.phone} autoComplete="tel" placeholder="+62 812 3456 7890" />
             <TextInput id="address" label="Full address" className="sm:col-span-2" value={form.address} onChange={(v) => setField('address', v)} error={errors.address} autoComplete="street-address" placeholder="Street, building, RT/RW, district" />
@@ -247,7 +247,7 @@
               <div className="fade-in grid gap-4 rounded-xl border border-gray-200 bg-white p-5 sm:grid-cols-2">
                 <TextInput id="cc-number" label="Card number" className="sm:col-span-2" inputMode="numeric" autoComplete="cc-number" placeholder="4242 4242 4242 4242" maxLength={19}
                   value={card.number} onChange={(v) => setCardField('number', v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim())} error={errors.number} />
-                <TextInput id="cc-name" label="Name on card" className="sm:col-span-2" autoComplete="cc-name" placeholder="RANI WIJAYA"
+                <TextInput id="cc-name" label="Name on card" className="sm:col-span-2" autoComplete="cc-name" placeholder="KARINA"
                   value={card.name} onChange={(v) => setCardField('name', v)} error={errors.name} />
                 <TextInput id="cc-exp" label="Expiry (MM/YY)" inputMode="numeric" autoComplete="cc-exp" placeholder="08/28" maxLength={5}
                   value={card.exp} onChange={(v) => { const d = v.replace(/\D/g, '').slice(0, 4); setCardField('exp', d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d); }} error={errors.exp} />
@@ -355,7 +355,7 @@
     /* ---------- App ---------- */
     const validators = {
       first: (v) => (v.trim() ? '' : 'Please enter your first name.'),
-      last: (v) => (v.trim() ? '' : 'Please enter your last name.'),
+      last: () => '',
       phone: (v) => (/^(\+?62|0)8\d{7,12}$/.test(v.replace(/[\s-]/g, '')) ? '' : 'Enter a valid Indonesian mobile number.'),
       address: (v) => (v.trim().length >= 10 ? '' : 'Please enter your full address (street, number, district).'),
       city: (v) => (v.trim() ? '' : 'Please enter your city.'),

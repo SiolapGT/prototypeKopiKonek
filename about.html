@@ -350,7 +350,7 @@
       var FEED_KEY = 'kopikonek_community_posts_v1';
       var defaultPosts = [
         {
-          author: 'Rani Wijaya · Jakarta Selatan',
+          author: 'Karina · Jakarta Selatan',
           badge: 'Home Brewer',
           bean: 'West Java Kamojang — Kala Roastery',
           method: 'Hario V60 Ceramic 02 · 15g : 240ml @ 91°C',
@@ -378,7 +378,10 @@
       function getPosts() {
         try {
           var raw = localStorage.getItem(FEED_KEY);
-          return raw ? JSON.parse(raw) : defaultPosts;
+          if (!raw) return defaultPosts;
+          var list = JSON.parse(raw);
+          list.forEach(function (p) { if (p.author && p.author.indexOf('Rani Wijaya') !== -1) p.author = p.author.replace('Rani Wijaya', 'Karina'); });
+          return list;
         } catch (e) { return defaultPosts; }
       }
 
