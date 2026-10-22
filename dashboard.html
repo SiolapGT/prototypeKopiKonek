@@ -390,9 +390,9 @@
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                        ✓ Verified Roastery Partner
+                        Verified Roastery Partner
                       </span>
-                      <span className="text-xs text-cream/70">📍 Jl. Braga No. 88, Bandung, West Java</span>
+                      <span className="text-xs text-cream/70">Jl. Braga No. 88, Bandung, West Java</span>
                     </div>
                     <h1 className="font-serif text-2xl sm:text-4xl font-semibold mt-1">
                       Kala Roastery — Seller Dashboard
@@ -474,7 +474,8 @@
                   <div className="bg-white rounded-2xl p-6 border-2 border-terracotta/30 shadow-sm relative overflow-hidden">
                     <div className="flex items-center justify-between">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-900">
-                        🔒 Dana di Escrow
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                        Dana di Escrow
                       </span>
                       <span className="text-xs font-semibold text-terracotta">
                         {stats.totalEscrowCount} Pesanan Aktif
@@ -498,7 +499,8 @@
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-900">
-                          ✓ Saldo Siap Cair
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                          Saldo Siap Cair
                         </span>
                         <span className="text-xs text-emerald-700 font-medium">
                           {stats.releasedCount} Pesanan Selesai
@@ -639,9 +641,9 @@
                   <div className="flex flex-wrap gap-2">
                     {[
                       { id: 'all', label: `Semua (${orders.length})` },
-                      { id: 'escrow_pending', label: `🔒 Perlu Dikirim · Escrow (${stats.escrowPendingCount})` },
-                      { id: 'escrow_shipped', label: `🚚 Dalam Pengiriman · Escrow (${stats.escrowShippedCount})` },
-                      { id: 'released', label: `✓ Dana Cair (${stats.releasedCount})` },
+                      { id: 'escrow_pending', label: `Perlu Dikirim · Escrow (${stats.escrowPendingCount})` },
+                      { id: 'escrow_shipped', label: `Dalam Pengiriman · Escrow (${stats.escrowShippedCount})` },
+                      { id: 'released', label: `Dana Cair (${stats.releasedCount})` },
                     ].map((f) => (
                       <button
                         key={f.id}
@@ -743,17 +745,20 @@
                           <div>
                             {isPending && (
                               <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-950 border border-amber-300">
-                                🔒 Dana Ditahan di Escrow · Perlu Dikirim
+                                <span className="w-2 h-2 rounded-full bg-amber-600"></span>
+                                Dana Ditahan di Escrow · Perlu Dikirim
                               </span>
                             )}
                             {isShipped && (
                               <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-900 border border-blue-200">
-                                🚚 Dalam Pengiriman (Resi: {order.trackingNo}) · Dana di Escrow
+                                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                                Dalam Pengiriman (Resi: {order.trackingNo}) · Dana di Escrow
                               </span>
                             )}
                             {isReleased && (
                               <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-900 border border-emerald-300">
-                                ✓ Selesai · Dana Escrow Telah Cair ke Saldo Toko
+                                <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                                Selesai · Dana Escrow Telah Cair ke Saldo Toko
                               </span>
                             )}
                           </div>
@@ -991,7 +996,7 @@
                                 onClick={() => handleSetRoastedToday(bean.id)}
                                 className="px-3.5 py-2 rounded-xl bg-taupe hover:bg-espresso/15 text-espresso text-xs font-semibold transition"
                               >
-                                🔥 Set Sangrai Hari Ini ({BM.formatDate(BM.TODAY_ISO)})
+                                Set Sangrai Hari Ini ({BM.formatDate(BM.TODAY_ISO)})
                               </button>
 
                               <button

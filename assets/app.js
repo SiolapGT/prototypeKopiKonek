@@ -362,7 +362,7 @@
     var sel = $('input[name="brew"]:checked');
     var hint = $('#match-hint');
     if (!sel) {
-      hint.textContent = 'Pick how you brew first ☝';
+      hint.textContent = 'Please select how you brew above.';
       var o = $('#brew-options'); o.classList.remove('shake'); void o.offsetWidth; o.classList.add('shake'); return;
     }
     hint.textContent = '';

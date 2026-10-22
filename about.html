@@ -37,12 +37,6 @@
 </head>
 <body class="bg-cream text-espresso font-sans antialiased selection:bg-terracotta/20 selection:text-espresso">
 
-  <!-- Top Announcement Bar -->
-  <div class="bg-espresso text-cream text-xs tracking-wide py-2.5 px-4 text-center">
-    <span class="inline-block w-2 h-2 rounded-full bg-sage mr-2 align-middle"></span>
-    <strong>KopiKonek Story &amp; Community Hub</strong> — Connecting Archipelago Roasters &amp; Home Brewers Across Indonesia.
-  </div>
-
   <!-- Header & Navigation -->
   <header class="sticky top-0 z-30 bg-cream/95 backdrop-blur-md border-b border-espresso/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
@@ -401,14 +395,14 @@
                   '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-taupe text-espresso">' + p.badge + '</span>' +
                 '</div>' +
                 '<div class="mt-3 p-3 rounded-2xl bg-cream border border-espresso/10 text-xs space-y-1">' +
-                  '<div class="font-semibold text-terracotta">☕ ' + p.bean + '</div>' +
-                  '<div class="text-charcoal/80">⚙️ ' + p.method + '</div>' +
+                  '<div class="font-semibold text-terracotta"><span class="text-charcoal/60 font-medium">Bean:</span> ' + p.bean + '</div>' +
+                  '<div class="text-charcoal/80"><span class="text-charcoal/60 font-medium">Method:</span> ' + p.method + '</div>' +
                 '</div>' +
                 '<p class="text-sm text-charcoal/90 mt-3.5 leading-relaxed">“' + p.notes + '”</p>' +
               '</div>' +
               '<div class="mt-4 pt-3 border-t border-espresso/10 flex items-center justify-between text-xs text-charcoal/70">' +
                 '<span>Verified Community Brew Log</span>' +
-                '<span class="font-semibold text-espresso">♥ ' + (p.likes || 12) + ' Brewers helped</span>' +
+                '<span class="font-semibold text-espresso">' + (p.likes || 12) + ' Brewers helped</span>' +
               '</div>' +
             '</article>'
           );
