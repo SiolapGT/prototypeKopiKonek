@@ -1,4 +1,4 @@
-/* KopiKonek — shared catalog, vendors & cart store (used by index.html and checkout.html) */
+/* KopiKonek — shared catalog, vendors, cart & auth store (used by index.html, login.html & checkout.html) */
 (function () {
   'use strict';
 
@@ -6,6 +6,7 @@
   var PROTOTYPE_TODAY = new Date(2026, 9, 14);
   var PLATFORM_FEE = 2500;
   var CART_KEY = 'kopikonek_cart_v1';
+  var AUTH_KEY = 'kopikonek_user_v1';
 
   var FALLBACK_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
@@ -148,8 +149,55 @@
     }
   };
 
+  /* ---------- Auth store (localStorage) ---------- */
+  var DEMO_USERS = {
+    buyer: {
+      name: 'Rani Wijaya',
+      firstName: 'Rani',
+      lastName: 'Wijaya',
+      initials: 'RW',
+      email: 'rani.wijaya@kopikonek.id',
+      role: 'buyer',
+      phone: '081234567890',
+      address: 'Jl. Senopati No. 42, Kebayoran Baru',
+      city: 'Jakarta Selatan',
+      zip: '12190'
+    },
+    roaster: {
+      name: 'Kala Roastery',
+      firstName: 'Arif',
+      lastName: 'Santoso',
+      initials: 'KR',
+      email: 'hello@kalaroastery.id',
+      role: 'roaster',
+      phone: '081322446688',
+      address: 'Jl. Braga No. 88, Sumur Bandung',
+      city: 'Bandung',
+      zip: '40111'
+    }
+  };
+
+  var auth = {
+    user: function () {
+      try {
+        var raw = localStorage.getItem(AUTH_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { return null; }
+    },
+    login: function (u) {
+      try { localStorage.setItem(AUTH_KEY, JSON.stringify(u)); } catch (e) { /* ignore */ }
+      document.dispatchEvent(new CustomEvent('auth:change'));
+      return u;
+    },
+    logout: function () {
+      try { localStorage.removeItem(AUTH_KEY); } catch (e) { /* ignore */ }
+      document.dispatchEvent(new CustomEvent('auth:change'));
+    },
+    demos: DEMO_USERS
+  };
+
   window.BM = {
-    PLATFORM_FEE: PLATFORM_FEE, CART_KEY: CART_KEY, vendors: vendors, products: products, productMap: productMap,
-    fmt: fmt, formatDate: formatDate, daysSince: daysSince, cart: cart, img: img, fallback: FALLBACK_IMG
+    PLATFORM_FEE: PLATFORM_FEE, CART_KEY: CART_KEY, AUTH_KEY: AUTH_KEY, vendors: vendors, products: products, productMap: productMap,
+    fmt: fmt, formatDate: formatDate, daysSince: daysSince, cart: cart, auth: auth, img: img, fallback: FALLBACK_IMG
   };
 })();

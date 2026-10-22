@@ -51,7 +51,13 @@
                  class="w-full rounded-full border border-espresso/15 bg-white py-3 pl-12 pr-4 text-sm shadow-sm outline-none transition placeholder:text-espresso/40 focus:border-espresso/40 focus:ring-4 focus:ring-espresso/10" />
         </form>
 
-        <div class="ml-auto flex items-center gap-1 md:ml-0">
+        <div class="ml-auto flex items-center gap-2.5 md:ml-0">
+          <div id="auth-slot" class="hidden sm:flex items-center">
+            <a href="login.html" class="inline-flex items-center gap-2 rounded-full border border-espresso/20 px-4 py-2 text-sm font-semibold text-espresso transition hover:border-espresso hover:bg-espresso hover:text-cream active:scale-95">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M4 20c1.8-3.5 5-5 8-5s6.2 1.5 8 5"/></svg>
+              Sign In
+            </a>
+          </div>
           <button id="cart-btn" class="relative rounded-full p-2.5 transition hover:bg-espresso/5 active:scale-95" aria-label="Open shopping cart">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.200 11.200a2 2 0 0 0 2 1.600h7.600a2 2 0 0 0 2-1.500L20.500 8H6.200"/><circle cx="9.500" cy="20" r="1.200"/><circle cx="17" cy="20" r="1.200"/></svg>
             <span id="cart-badge" class="absolute -right-0.5 -top-0.5 grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-terracotta px-1 text-[11px] font-semibold text-white ring-2 ring-cream transition">0</span>
@@ -74,6 +80,9 @@
           <a href="#roasteries" class="rounded-lg px-3 py-3 hover:bg-espresso/5">Roasteries</a>
           <a href="#subscription" data-nav="subscription" class="rounded-lg px-3 py-3 hover:bg-espresso/5">Subscription</a>
         </nav>
+        <div id="auth-slot-m" class="border-t border-espresso/10 pt-4">
+          <a href="login.html" class="flex items-center justify-center gap-2 rounded-full bg-espresso py-3 text-sm font-semibold text-cream">Sign In / Create Account</a>
+        </div>
       </div>
     </div>
   </header>
@@ -265,7 +274,7 @@
           <div>
             <h3 class="font-serif text-lg text-cream">Track Order</h3>
             <ul class="mt-4 space-y-3 text-sm">
-              <li><a class="footer-link" href="#">Order status</a></li>
+              <li><a class="footer-link" href="login.html">Order status</a></li>
               <li><a class="footer-link" href="#">Shipping &amp; delivery</a></li>
               <li><a class="footer-link" href="#">Returns &amp; refunds</a></li>
               <li><a class="footer-link" href="#">Escrow protection</a></li>
@@ -274,8 +283,8 @@
           <div>
             <h3 class="font-serif text-lg text-cream">Sell on KopiKonek <span class="block font-sans text-xs text-cream/50">(For Roasters)</span></h3>
             <ul class="mt-4 space-y-3 text-sm">
-              <li><a class="footer-link" href="#">Open your store</a></li>
-              <li><a class="footer-link" href="#">Seller dashboard</a></li>
+              <li><a class="footer-link" href="login.html">Open your store</a></li>
+              <li><a class="footer-link" href="login.html">Seller dashboard</a></li>
               <li><a class="footer-link" href="#">Fees &amp; payouts</a></li>
             </ul>
           </div>

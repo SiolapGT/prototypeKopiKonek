@@ -6,7 +6,6 @@ A modern, premium e-commerce web prototype for a specialty coffee and brewing eq
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
-
 ---
 
 ## ✨ Features & Highlights
@@ -27,9 +26,16 @@ A modern, premium e-commerce web prototype for a specialty coffee and brewing eq
 - **Partner Roasteries Showcase**: Featuring indie micro-roasters across the Indonesian archipelago (*Bandung, Yogyakarta, Aceh, Ubud, etc.*).
 - **Interactive Brew Matchmaker**: Dynamic equipment and bean recommendations based on brewing method (*Espresso, Manual Brew, Cold Brew*).
 
-### 2. 💳 High-Fidelity Checkout (`checkout.html`)
+### 2. 🔐 Sign In & Create Account Portal (`login.html`)
 - Built with **React** & **Tailwind CSS**.
-- **Shipping Address Form**: Clean, validated input fields.
+- **Split-Screen Editorial Layout**: Coffee story, member benefits, and roastery testimonial on the left; interactive auth card on the right.
+- **Sign In & Registration Tabs**: Supports both **Coffee Lover (Buyer)** and **Roastery Partner (Seller)** account creation with password strength meter and show/hide password toggle.
+- **One-Click Demo Login**: Instant test buttons for *Rani (Buyer)* and *Kala Roastery (Partner)* that persist across the navbar and auto-fill checkout shipping details.
+- **Password Recovery Flow & Social Login**: Inline forgot-password view plus Google & Apple quick sign-in.
+
+### 3. 💳 High-Fidelity Checkout (`checkout.html`)
+- Built with **React** & **Tailwind CSS**.
+- **Shipping Address Form**: Clean, validated input fields (auto-filled when signed in).
 - **Multi-Vendor Delivery Options**: Independent delivery service options per vendor (*Regular, Next Day, Same Day*).
 - **Selectable Payment Methods**: Virtual Account (BCA, Mandiri, BNI), QRIS, and Credit Card with format validation.
 - **Sticky Order Summary**: Live cost breakdown (Subtotal, Combined Multi-vendor Shipping, Platform Fee, Grand Total) protected by simulated Escrow processing.
@@ -65,10 +71,11 @@ Then visit `http://localhost:3000`.
 
 ```
 ├── index.html          # Main storefront & marketplace prototype
+├── login.html          # Sign in, registration & demo account portal
 ├── checkout.html       # High-fidelity React multi-vendor checkout page
 ├── assets/
-│   ├── data.js         # Shared marketplace catalog, vendor registry & cart state
-│   ├── app.js          # Storefront interactivity, quick-view & cart drawer
+│   ├── data.js         # Shared marketplace catalog, vendor registry, cart & auth state
+│   ├── app.js          # Storefront interactivity, quick-view, auth header & cart drawer
 │   └── styles.css      # Custom animations, scroll reveals & typography styling
 └── README.md           # Documentation
 ```

@@ -34,6 +34,48 @@
     setTimeout(function () { t.classList.add('out'); setTimeout(function () { t.remove(); }, 300); }, 2400);
   }
 
+  /* ---------- Auth header slot ---------- */
+  function renderAuth() {
+    var u = BM.auth && BM.auth.user ? BM.auth.user() : null;
+    var slot = $('#auth-slot');
+    var slotM = $('#auth-slot-m');
+    if (slot) {
+      if (u) {
+        slot.innerHTML =
+          '<div class="flex items-center gap-1.5 rounded-full border border-espresso/15 bg-white py-1 pl-1.5 pr-3 text-xs font-semibold shadow-sm">' +
+            '<a href="login.html" class="flex items-center gap-2 hover:text-terracotta transition" title="Account settings (' + esc(u.email) + ')">' +
+              '<span class="grid h-7 w-7 place-items-center rounded-full bg-espresso text-[11px] font-bold text-cream">' + esc(u.initials || 'KK') + '</span>' +
+              '<span class="max-w-[7.5rem] truncate">' + esc(u.firstName || u.name) + '</span>' +
+            '</a>' +
+            '<button data-action="logout" class="ml-1 rounded-full p-1 text-espresso/45 transition hover:bg-espresso/5 hover:text-terracotta" title="Sign out" aria-label="Sign out">' +
+              '<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>' +
+            '</button>' +
+          '</div>';
+      } else {
+        slot.innerHTML =
+          '<a href="login.html" class="inline-flex items-center gap-2 rounded-full border border-espresso/20 px-4 py-2 text-sm font-semibold text-espresso transition hover:border-espresso hover:bg-espresso hover:text-cream active:scale-95">' +
+            '<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M4 20c1.8-3.5 5-5 8-5s6.2 1.5 8 5"/></svg>' +
+            'Sign In' +
+          '</a>';
+      }
+    }
+    if (slotM) {
+      if (u) {
+        slotM.innerHTML =
+          '<div class="flex items-center justify-between gap-3 rounded-2xl bg-white p-3 border border-espresso/10">' +
+            '<a href="login.html" class="flex items-center gap-3 min-w-0">' +
+              '<span class="grid h-9 w-9 flex-shrink-0 place-items-center rounded-full bg-espresso text-xs font-bold text-cream">' + esc(u.initials || 'KK') + '</span>' +
+              '<div class="min-w-0"><p class="truncate text-sm font-semibold">' + esc(u.name) + '</p><p class="truncate text-xs text-espresso/55">' + esc(u.email) + '</p></div>' +
+            '</a>' +
+            '<button data-action="logout" class="rounded-full border border-espresso/20 px-3 py-1.5 text-xs font-semibold hover:bg-espresso hover:text-cream">Sign Out</button>' +
+          '</div>';
+      } else {
+        slotM.innerHTML =
+          '<a href="login.html" class="flex items-center justify-center gap-2 rounded-full bg-espresso py-3 text-sm font-semibold text-cream">Sign In / Create Account</a>';
+      }
+    }
+  }
+
   /* ---------- Filters ---------- */
   function renderFilters() {
     $('#filters').innerHTML = CATEGORIES.map(function (c) {
@@ -330,7 +372,7 @@
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }) : null;
   function initReveal() {
-    $$('.reveal').forEach(function (el, i) {
+    $$('.reveal').forEach(function (el) {
       if (io) io.observe(el); else el.classList.add('is-visible');
     });
   }
@@ -378,6 +420,11 @@
         break;
       }
       case 'browse': state.vendor = null; setCat(t.dataset.cat); scrollToEl('#catalog'); break;
+      case 'logout':
+        BM.auth.logout();
+        toast('Signed out of KopiKonek');
+        $('#mobile-menu').classList.add('hidden');
+        break;
     }
   });
 
@@ -394,11 +441,12 @@
   $('#cart-close').addEventListener('click', closeCart);
   $('#cart-overlay').addEventListener('click', closeCart);
   document.addEventListener('cart:change', renderCart);
+  document.addEventListener('auth:change', renderAuth);
 
   $('#menu-btn').addEventListener('click', function () {
     var m = $('#mobile-menu'); var hidden = m.classList.toggle('hidden'); this.setAttribute('aria-expanded', String(!hidden));
   });
-  $$('#mobile-menu a').forEach(function (a) { a.addEventListener('click', function () { $('#mobile-menu').classList.add('hidden'); }); });
+  $$('#mobile-menu nav a').forEach(function (a) { a.addEventListener('click', function () { $('#mobile-menu').classList.add('hidden'); }); });
 
   function onSearch(val) {
     state.q = val; state.vendor = null; $('#search').value = val; $('#search-m').value = val;
@@ -426,6 +474,7 @@
   });
 
   /* ---------- Init ---------- */
+  renderAuth();
   renderFilters();
   renderGrid();
   renderRoasteries();
